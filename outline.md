@@ -1,10 +1,21 @@
 # libc 软件包分析报告
 	
 ## 1. 软件包基本信息
+任何类Unix操作系统都需要一个C库，这个库需要实现类似 open, malloc, printf, exit 等基本的系统函数接口。
+
+GNU libc 是在 GNU 项目中所使用的 C库，同样也被用在了 linux 中。
 
 1.1 软件包开发背景与目标
-	
+GNU libc 项目的主要目标，主要是为了设计一个可移植的，高性能的C库。
+
+它遵循所有相关标准，包括ISO C11和POSIX.1-2008。
+
 1.2 软件包维护者信息
+GNU libc 项目目前是由一个开发者社区在负责维护，大部分的开发人员信息可以从这个页面获得。
+http://sourceware.org/glibc/wiki/MAINTAINERS
+
+在 LinkedIn 上也有一个开发者的群组(group)，这个群组目前主要是由 Carlos O'Donell. http://sourceware.org/glibc/wiki/CarlosODonell
+
 	
 1.3 软件包所采用的版权协议
 	
@@ -43,3 +54,12 @@
 	
 ## 7. 软件包分析成果验证方法
 根据任务书，“分析成果进行验证，包括但不限于制作安装包安装测试验证依赖关系、软件包接口测试脚本、可替代软件包兼容性测试验证等。”，具体如何验证后续还有待通过研讨会大家现成讨论确定，但需要在此小节给出进行验证的具体方法和流程的描述，此部分后续在写，暂时空着即可。
+
+
+## 8. 参考资料
+GNU libc 项目主页：<http://www.gnu.org/software/libc/>
+
+GNU libc 参考手册：<http://www.gnu.org/software/libc/manual/>
+<http://www.gnu.org/software/libc/manual/pdf/libc.pdf>
+
+libc 说明：<http://en.wikipedia.org/wiki/C_standard_library>
