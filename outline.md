@@ -148,59 +148,195 @@ LGPL允许商业软件通过类库引用(link)方式使用LGPL类库而不需要
 ### 1.5 类似的可替代软件包简介overseen
 
 1) uClibc   
-* uClibc 是一个面向嵌入式Linux系统的小型C标准库。最初uClibc是为了支持uClinux而开发，因为uClinux不支持内存管理单元MMU，因此uClibc也适合于无MMU的硬件系统上。项目的维护者是Erik Andersen，许可证遵从GNU LGPL。
-* 项目主页 http://www.uclibc.org/
+	- uClibc 是一个面向嵌入式Linux系统的小型C标准库。最初uClibc是为了支持uClinux而开发，因为uClinux不支持内存管理单元MMU，因此uClibc也适合于无MMU的硬件系统上。项目的维护者是Erik Andersen，许可证遵从GNU LGPL。2012年5月15日，发布了最新版本uClibc-0.9.33.2。
+	- 项目主页 http://www.uclibc.org/
 
 2) Newlib  
-* Newlib 是目前Cygwin所使用的C标准库，是由Cygnus Solutions公司负责开发，在1999年11月15日，Cygnus Solutions宣布将与红帽公司Redhat合并，因此Newlib的主要维护者也是Redhat公司的员工--Corinna Vinschen和Jeff Johnston。
-* 项目主页 http://www.sourceware.org/newlib/
+	- Newlib 是目前Cygwin所使用的C标准库，是由Cygnus Solutions公司负责开发，在1999年11月15日，Cygnus Solutions宣布将与红帽公司Redhat合并，因此Newlib的主要维护者也是Redhat公司的员工--Corinna Vinschen和Jeff Johnston。Newlib由libc和libm两个库组成，特点是轻量级，速度快，可移植到很多CPU结构上。该项目2011年12月19日发布了最后一个版本1.20.0。
+	- 项目主页 http://www.sourceware.org/newlib/
 
 3) BSD libc  
-* BSD libc是FreeBSD操作系统所使用的C标准库，采用BSD协议发布。 
-* 项目主页 http://www.freebsd.org/cgi/cvsweb.cgi/src/lib/libc/
+	- BSD libc是FreeBSD操作系统所使用的C标准库，采用BSD协议发布。2012年11月17日发布了最新版本1.9.2.3。
+	- 项目主页 http://www.freebsd.org/cgi/cvsweb.cgi/src/lib/libc/
 
 4) Bionic libc  
-* Bionic libc 是从BSD标准Ｃ库发展而来，以BSD许可形式开源。它是由Google公司为其Android嵌入式手机平台开发的标准库。它的设计目标是在Linux之上采用BSD协议，实现更快执行速度和更小代码体积的c库。
+	- Bionic libc 是从BSD标准Ｃ库发展而来，以BSD许可形式开源。它是由Google公司为其Android嵌入式手机平台开发的标准库。它的设计目标是在Linux之上采用BSD协议，实现更快执行速度和更小代码体积的c库。
 
 5) dietlibc  
-* dietlibc是一个非常精简的C标准库实现。发起者和创始人是德国的Felix von Leitner，其目标是能够将编译链接之后生成的可执行代码减到最少。这个项目和之前的libc项目没有什么关联，完全是从头写起的。它并没有实现glibc中的所有函数，只实现了最常用的部分。采用GPL2协议发布。
-* 项目主页 http://www.fefe.de/dietlibc/
+	- dietlibc是一个非常精简的C标准库实现。发起者和创始人是德国的Felix von Leitner，其目标是能够将编译链接之后生成的可执行代码减到最少。这个项目和之前的libc项目没有什么关联，完全是从头写起的。它并没有实现glibc中的所有函数，只实现了最常用的部分。采用GPL2协议发布。
+	- 项目主页 http://www.fefe.de/dietlibc/
 
 6) EGLIBC  
-* EGLIBC是GNU C标准库(glibc)的一个分支，主要是为嵌入式设备进行优化。它采用LGPL协议发布。
-* 项目主页 http://www.eglibc.org/
+	- EGLIBC是GNU C标准库(glibc)的一个分支，主要是为嵌入式设备进行优化。它采用LGPL协议发布。
+	- 项目主页 http://www.eglibc.org/
 	
 ### 1.6 软件包与可替代软件包对比分析
+
+<table width="100%" border="1">
+  <tr>
+    <th>对比</th>
+    <th>应用领域</th>
+    <th>采用协议</th>
+    <th>特点</th>
+  </tr>
+  <tr>
+    <td align="center">glibc</td>
+    <td align="center">桌面领域，GNU/Linux操作系统</td>
+    <td align="center">LGPL</td>
+    <td align="center">功能全面</td>
+  </tr>
+  <tr>
+    <td align="center">uClibc</td>
+    <td align="center">嵌入式领域，uCLinux操作系统</td>
+    <td align="center">LGPL</td>
+    <td align="center">主要用在uCLinux系统中</td>
+  </tr>
+  <tr>
+    <td align="center">Newlib</td>
+    <td align="center">桌面领域，Cygwin系统</td>
+    <td align="center">LGPL</td>
+    <td align="center">具有独特的设计，可移植性强</td>
+  </tr>
+  <tr>
+    <td align="center">BSD libc</td>
+    <td align="center">桌面领域，FreeBSD操作系统</td>
+    <td align="center">BSD</td>
+    <td align="center">主要用在BSD系统中</td>
+  </tr>
+  <tr>
+    <td align="center">Bionic libc</td>
+    <td align="center">手机嵌入式领域，Android操作系统</td>
+    <td align="center">BSD</td>
+    <td align="center">主要用在Android系统中</td>
+  </tr>
+  <tr>
+    <td align="center">dietlibc</td>
+    <td align="center">各种对体积尺寸要求严格的领域</td>
+    <td align="center">GPL2</td>
+    <td align="center">设计非常精巧，适合学习</td>
+  </tr>
+  <tr>
+    <td align="center">EGLIBC</td>
+    <td align="center">桌面领域，Ubuntu操作系统</td>
+    <td align="center">LGPL</td>
+    <td align="center">主要用在Ubuntu系统中</td>
+  </tr>
+</table>
+
 	
 ## 2. 软件包与发行版的关系
 本小节需要介绍和阐述软件包在不同发行版中的名称、功能、运行环境的异同，除了正文描述以外，最好填下表以便更清晰，建议不超过1页。
 	
 发行版名称及版本号	软件包在该发行版中的名称	该软件包的功能	该软件包的运行环境
-			
+
+<table width="100%" border="1">  
+  <tr>
+    <th>发行版名称及版本号</th>
+    <th>软件包在该发行版中的名称</th>
+    <th>该软件包的功能</th>
+    <th>该软件包的运行环境</th>
+  </tr>
+  <tr>
+    <td>？</td>
+    <td>？？</td>
+    <td>？？？</td>
+    <td>？？？？</td>
+  </tr>
+</table>
 		
-			
 	
 ## 3. 软件包的功能、设计架构和接口使用说明
-3.1 软件包的功能说明
-此处建议在半页以内，说明功能即可。
-	
-3.2 软件包的设计架构
-此小节建议通过框图和文字说明软件包的内部设计结构，最多1页即可。
-	
-3.3 软件包的接口说明
-建议这部分最多写3页，如果接口很多，挑最重要的接口写2-3页即可，否则工作量将会非常大，不能在本任务的经费支持范围之内。
+### 3.1 软件包的功能说明
+glibc 是Linux系统中最底层的库函数接口，其他的运行库都会依赖于这个库。
+它除了封装了Linux系统调用，同时也提供了一些其他必要功能，主要包括：
+
+* 字符串处理 string
+* 信号处理 signal
+* 本地化 locale
+* 数学库 math
+* 线程库 linuxthreads
+* 动态内存管理 malloc 
+* 动态加载器 elf
+* C 标准库 libc
+
+### 3.2 软件包的设计架构
+	此小节建议通过框图和文字说明软件包的内部设计结构，最多1页即可。
+
+到目前为止，C标准库规定了29个头文件，如下：
+
+* C89  
+C89标准规定了15个头文件，分别是 assert.h ctype.h errno.h float.h limits.h locale.h math.h setjmp.h signal.h stdarg.h stddef.h  stdio.h stdlib.h string.h time.h
+
+* NA1  
+在95年的修正版NA1中，增补了3个头文件，分别是 iso646.h, wchar.h, and wctype.h
+
+* C99  
+C99标准增加了6个新的头文件，分别是 complex.h, fenv.h, inttypes.h, stdbool.h, stdint.h, and tgmath.h
+
+* C11  
+C99标准增加了5个新的头文件，分别是 stdalign.h, stdatomic.h, stdnoreturn.h, threads.h, and uchar.h
+
+### 3.3 软件包的接口说明
+	建议这部分最多写3页，如果接口很多，挑最重要的接口写2-3页即可，否则工作量将会非常大，不能在本任务的经费支持范围之内。
+	因为主要讨论libc，因此对于glibc中不在libc范畴内的不在这里涉及。
+
+* assert.h
+* assert.h 
+* ctype.h 
+* errno.h 
+* float.h 
+* limits.h 
+* locale.h 
+* math.h 
+* setjmp.h
+* signal.h
+* stdarg.h
+* stddef.h
+* stdio.h
+* stdlib.h
+* string.h
+* time.h
+	- ...
+
+* iso646.h
+* wchar.h
+* wctype.h
+	- ...
+
+* complex.h
+* fenv.h
+* inttypes.h
+* stdbool.h
+* stdint.h
+* tgmath.h
+	- ...
+
+* stdalign.h
+* stdatomic.h
+* stdnoreturn.h
+* threads.h
+* uchar.h
+	- ...
+
+
+
+
+
 
 ## 4. 软件包漏洞分析
-这部分任务书的要求是“针对子任务“Linux、Android操作系统安全漏洞检测”中发现的通用基础软件包安全漏洞的确认分析，包括漏洞产生的原因、漏洞可重现条件及相应的测试用例, 并可进行复现和验证；”，但是此部分待定，暂时不要去写，将根据后续情况经过大家的讨论之后再写。因为漏洞的检测有赖另外一个项目（“Linux、Android操作系统安全漏洞检测”）给出，如果漏洞非常多，我们可能需要分出重要性，分类进行处理。
+	这部分任务书的要求是“针对子任务“Linux、Android操作系统安全漏洞检测”中发现的通用基础软件包安全漏洞的确认分析，包括漏洞产生的原因、漏洞可重现条件及相应的测试用例, 并可进行复现和验证；”，但是此部分待定，暂时不要去写，将根据后续情况经过大家的讨论之后再写。因为漏洞的检测有赖另外一个项目（“Linux、Android操作系统安全漏洞检测”）给出，如果漏洞非常多，我们可能需要分出重要性，分类进行处理。
 	
 ## 5. 软件包的依赖关系
-这部分请用文字和图说明该软件包的运行还需依赖哪些其他的软件包，其依赖关系不仅要通过阅读文档、代码来获得，更要通过实际的运行验证来获得依赖关系的证据，这一点请慎重处理。
+	这部分请用文字和图说明该软件包的运行还需依赖哪些其他的软件包，其依赖关系不仅要通过阅读文档、代码来获得，更要通过实际的运行验证来获得依赖关系的证据，这一点请慎重处理。
+
+* Glibc 安装依赖关系  
+Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Gettext, Grep, Make, Perl, Sed, Texinfo[1].
 	
 ## 6. 软件包安全性及特别需要说明的问题
-本部分请撰写不能包括在上述章节中的其他重要分析成果，特别是和系统安全有关的内容，如果没有请填写“无”。
+	本部分请撰写不能包括在上述章节中的其他重要分析成果，特别是和系统安全有关的内容，如果没有请填写“无”。
 	
 ## 7. 软件包分析成果验证方法
-根据任务书，“分析成果进行验证，包括但不限于制作安装包安装测试验证依赖关系、软件包接口测试脚本、可替代软件包兼容性测试验证等。”，具体如何验证后续还有待通过研讨会大家现成讨论确定，但需要在此小节给出进行验证的具体方法和流程的描述，此部分后续在写，暂时空着即可。
+	根据任务书，“分析成果进行验证，包括但不限于制作安装包安装测试验证依赖关系、软件包接口测试脚本、可替代软件包兼容性测试验证等。”，具体如何验证后续还有待通过研讨会大家现成讨论确定，但需要在此小节给出进行验证的具体方法和流程的描述，此部分后续在写，暂时空着即可。
 
 
 ## 8. 参考资料
@@ -225,4 +361,10 @@ Changes in glibc development
 
 开源软件协议比较
 <http://www.awflasher.com/blog/archives/939>
+
+GNU C Library version 1.16 发布声明
+<http://thread.gmane.org/gmane.comp.lib.glibc.alpha/23457>
+
+C99标准
+<http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899>
 
