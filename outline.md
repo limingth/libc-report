@@ -281,9 +281,13 @@ C99标准增加了5个新的头文件，分别是 stdalign.h, stdatomic.h, stdno
 	因为主要讨论libc，因此对于glibc中不在libc范畴内的不在这里涉及。
 
 * assert.h
-* assert.h 
+	- assert(expr) 宏定义
 * ctype.h 
+	- isupper(c) 宏定义
+	- isdigit(c) 宏定义
+	- isspace(c) 宏定义
 * errno.h 
+	- error() 函数声明
 * float.h 
 * limits.h 
 * locale.h 
