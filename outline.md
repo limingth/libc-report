@@ -147,26 +147,26 @@ LGPL允许商业软件通过类库引用(link)方式使用LGPL类库而不需要
 
 ### 1.5 类似的可替代软件包简介overseen
 
-* 1) uClibc   
+* uClibc   
 	- uClibc 是一个面向嵌入式Linux系统的小型C标准库。最初uClibc是为了支持uClinux而开发，因为uClinux不支持内存管理单元MMU，因此uClibc也适合于无MMU的硬件系统上。项目的维护者是Erik Andersen，许可证遵从GNU LGPL。2012年5月15日，发布了最新版本uClibc-0.9.33.2。
 	- 项目主页 http://www.uclibc.org/
 
-2) Newlib  
+* Newlib  
 	- Newlib 是目前Cygwin所使用的C标准库，是由Cygnus Solutions公司负责开发，在1999年11月15日，Cygnus Solutions宣布将与红帽公司Redhat合并，因此Newlib的主要维护者也是Redhat公司的员工--Corinna Vinschen和Jeff Johnston。Newlib由libc和libm两个库组成，特点是轻量级，速度快，可移植到很多CPU结构上。该项目2011年12月19日发布了最后一个版本1.20.0。
 	- 项目主页 http://www.sourceware.org/newlib/
 
-3) BSD libc  
+* BSD libc  
 	- BSD libc是FreeBSD操作系统所使用的C标准库，采用BSD协议发布。2012年11月17日发布了最新版本1.9.2.3。
 	- 项目主页 http://www.freebsd.org/cgi/cvsweb.cgi/src/lib/libc/
 
-4) Bionic libc  
+* Bionic libc  
 	- Bionic libc 是从BSD标准Ｃ库发展而来，以BSD许可形式开源。它是由Google公司为其Android嵌入式手机平台开发的标准库。它的设计目标是在Linux之上采用BSD协议，实现更快执行速度和更小代码体积的c库。
 
-5) dietlibc  
+* dietlibc  
 	- dietlibc是一个非常精简的C标准库实现。发起者和创始人是德国的Felix von Leitner，其目标是能够将编译链接之后生成的可执行代码减到最少。这个项目和之前的libc项目没有什么关联，完全是从头写起的。它并没有实现glibc中的所有函数，只实现了最常用的部分。采用GPL2协议发布。
 	- 项目主页 http://www.fefe.de/dietlibc/
 
-6) EGLIBC  
+* EGLIBC  
 	- EGLIBC是GNU C标准库(glibc)的一个分支，主要是为嵌入式设备进行优化。它采用LGPL协议发布。
 	- 项目主页 http://www.eglibc.org/
 	
