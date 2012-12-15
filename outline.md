@@ -481,22 +481,22 @@ C99标准增加了5个新的头文件，分别是 stdalign.h, stdatomic.h, stdno
 	#define NULL ((void *)0)
 
 #### 其它头文件略
-* iso646.h
-* wchar.h
-* wctype.h
+	* iso646.h 
+	* wchar.h
+	* wctype.h
 
-* complex.h
-* fenv.h
-* inttypes.h
-* stdbool.h
-* stdint.h
-* tgmath.h
+	* complex.h
+	* fenv.h
+	* inttypes.h
+	* stdbool.h
+	* stdint.h
+	* tgmath.h
 
-* stdalign.h
-* stdatomic.h
-* stdnoreturn.h
-* threads.h
-* uchar.h
+	* stdalign.h
+	* stdatomic.h
+	* stdnoreturn.h
+	* threads.h
+	* uchar.h
 
 ## 4. 软件包漏洞分析
 这部分任务书的要求是“针对子任务“Linux、Android操作系统安全漏洞检测”中发现的通用基础软件包安全漏洞的确认分析，包括漏洞产生的原因、漏洞可重现条件及相应的测试用例, 并可进行复现和验证；”，但是此部分待定，暂时不要去写，将根据后续情况经过大家的讨论之后再写。因为漏洞的检测有赖另外一个项目（“Linux、Android操作系统安全漏洞检测”）给出，如果漏洞非常多，我们可能需要分出重要性，分类进行处理。
@@ -505,7 +505,7 @@ C99标准增加了5个新的头文件，分别是 stdalign.h, stdatomic.h, stdno
 这部分请用文字和图说明该软件包的运行还需依赖哪些其他的软件包，其依赖关系不仅要通过阅读文档、代码来获得，更要通过实际的运行验证来获得依赖关系的证据，这一点请慎重处理。
 
 * Glibc 安装依赖关系  
-Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Gettext, Grep, Make, Perl, Sed, Texinfo[1].
+Bash, Binutils, Coreutils, Diffutils, Gawk, GCC, Gettext, Grep, Make, Perl, Sed, Texinfo
 	
 ## 6. 软件包安全性及特别需要说明的问题
 本部分请撰写不能包括在上述章节中的其他重要分析成果，特别是和系统安全有关的内容，如果没有请填写“无”。
@@ -528,21 +528,21 @@ GNU libc 参考手册：
 libc 说明：
 <http://en.wikipedia.org/wiki/C_standard_library>
 
-C STANDARDS (C标准) 
+C STANDARDS (C标准)：
 <http://www.keil.com/support/docs/1893.htm>
 
-GNU C Library 
+GNU C Library：
 <http://en.wikipedia.org/wiki/GNU_C_Library>
 
-Changes in glibc development
+Changes in glibc development：
 <http://lwn.net/Articles/488778/>
 
-开源软件协议比较
+开源软件协议比较：
 <http://www.awflasher.com/blog/archives/939>
 
-GNU C Library version 1.16 发布声明
+GNU C Library version 1.16 发布声明：
 <http://thread.gmane.org/gmane.comp.lib.glibc.alpha/23457>
 
-C99标准
+C99标准：
 <http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899>
 
