@@ -227,20 +227,36 @@ LGPL允许商业软件通过类库引用(link)方式使用LGPL类库而不需要
 ## 2. 软件包与发行版的关系
 本小节需要介绍和阐述软件包在不同发行版中的名称、功能、运行环境的异同，除了正文描述以外，最好填下表以便更清晰，建议不超过1页。
 	
-发行版名称及版本号	软件包在该发行版中的名称	该软件包的功能	该软件包的运行环境
-
 <table width="100%" border="1">  
   <tr>
     <th>发行版名称及版本号</th>
     <th>软件包在该发行版中的名称</th>
-    <th>该软件包的功能</th>
-    <th>该软件包的运行环境</th>
+    <th>该软件包的版本</th>
+    <th>该软件包的安装</th>
   </tr>
   <tr>
-    <td>？</td>
-    <td>？？</td>
-    <td>？？？</td>
-    <td>？？？？</td>
+    <td>Ubuntu 10.04</td>
+    <td>EGLIBC</td>
+    <td>2.11.1</td>
+    <td>sudo apt-get install libc6-dev <br>sudo apt-get install glibc-doc </td>
+  </tr>
+  <tr>
+    <td>Redhat9</td>
+    <td>glibc</td>
+    <td>2.3.2</td>
+    <td>rpm -Uvh glibc-kernheaders-2.4-8.34.i386.rpm <br>rpm -Uvh glibc-headers-2.3.2-95.3.i386.rpm <br>rpm -Uvh glibc-derel-2.3.2-95.3.i386.rpm</td>
+  </tr>
+  <tr>
+    <td>Fedora</td>
+    <td>glibc</td>
+    <td>2.15-23.fc17</td>
+    <td>yum install glibc-devel.i686 glibc.i686</td>
+  </tr>
+  <tr>
+    <td>OpenSUSE</td>
+    <td>glibc</td>
+    <td>2.3.3</td>
+    <td>rpm -ivh glibc-devel-2.3.3-98.28.i586.rpm </td>
   </tr>
 </table>
 		
