@@ -147,23 +147,28 @@ LGPL允许商业软件通过类库引用(link)方式使用LGPL类库而不需要
 
 ### 1.5 类似的可替代软件包简介overseen
 
-* uClibc   
-	- uClibc 是一个面向嵌入式Linux系统的小型C标准库。最初uClibc是为了支持uClinux而开发，因为uClinux不支持内存管理单元MMU，因此uClibc也适合于无MMU的硬件系统上。项目的维护者是Erik Andersen，许可证遵从GNU LGPL。2012年5月15日，发布了最新版本uClibc-0.9.33.2。
-	- 项目主页 http://www.uclibc.org/  
-* Newlib  
-	- Newlib 是目前Cygwin所使用的C标准库，是由Cygnus Solutions公司负责开发，在1999年11月15日，Cygnus Solutions宣布将与红帽公司Redhat合并，因此Newlib的主要维护者也是Redhat公司的员工--Corinna Vinschen和Jeff Johnston。Newlib由libc和libm两个库组成，特点是轻量级，速度快，可移植到很多CPU结构上。该项目2011年12月19日发布了最后一个版本1.20.0。
-	- 项目主页 http://www.sourceware.org/newlib/
-* BSD libc  
-	- BSD libc是FreeBSD操作系统所使用的C标准库，采用BSD协议发布。2012年11月17日发布了最新版本1.9.2.3。
-	- 项目主页 http://www.freebsd.org/cgi/cvsweb.cgi/src/lib/libc/
-* Bionic libc  
-	- Bionic libc 是从BSD标准Ｃ库发展而来，以BSD许可形式开源。它是由Google公司为其Android嵌入式手机平台开发的标准库。它的设计目标是在Linux之上采用BSD协议，实现更快执行速度和更小代码体积的c库。
-* dietlibc  
-	- dietlibc是一个非常精简的C标准库实现。发起者和创始人是德国的Felix von Leitner，其目标是能够将编译链接之后生成的可执行代码减到最少。这个项目和之前的libc项目没有什么关联，完全是从头写起的。它并没有实现glibc中的所有函数，只实现了最常用的部分。采用GPL2协议发布。
-	- 项目主页 http://www.fefe.de/dietlibc/
-* EGLIBC  
-	- EGLIBC是GNU C标准库(glibc)的一个分支，主要是为嵌入式设备进行优化。它采用LGPL协议发布。
-	- 项目主页 http://www.eglibc.org/
+#### uClibc   
+* uClibc 是一个面向嵌入式Linux系统的小型C标准库。最初uClibc是为了支持uClinux而开发，因为uClinux不支持内存管理单元MMU，因此uClibc也适合于无MMU的硬件系统上。项目的维护者是Erik Andersen，许可证遵从GNU LGPL。2012年5月15日，发布了最新版本uClibc-0.9.33.2。
+* 项目主页 http://www.uclibc.org/ 
+ 
+#### Newlib  
+* Newlib 是目前Cygwin所使用的C标准库，是由Cygnus Solutions公司负责开发，在1999年11月15日，Cygnus Solutions宣布将与红帽公司Redhat合并，因此Newlib的主要维护者也是Redhat公司的员工--Corinna Vinschen和Jeff Johnston。Newlib由libc和libm两个库组成，特点是轻量级，速度快，可移植到很多CPU结构上。该项目2011年12月19日发布了最后一个版本1.20.0。
+* 项目主页 http://www.sourceware.org/newlib/
+
+#### BSD libc  
+* BSD libc是FreeBSD操作系统所使用的C标准库，采用BSD协议发布。2012年11月17日发布了最新版本1.9.2.3。
+* 项目主页 http://www.freebsd.org/cgi/cvsweb.cgi/src/lib/libc/
+
+#### Bionic libc  
+* Bionic libc 是从BSD标准Ｃ库发展而来，以BSD许可形式开源。它是由Google公司为其Android嵌入式手机平台开发的标准库。它的设计目标是在Linux之上采用BSD协议，实现更快执行速度和更小代码体积的c库。
+
+#### dietlibc  
+* dietlibc是一个非常精简的C标准库实现。发起者和创始人是德国的Felix von Leitner，其目标是能够将编译链接之后生成的可执行代码减到最少。这个项目和之前的libc项目没有什么关联，完全是从头写起的。它并没有实现glibc中的所有函数，只实现了最常用的部分。采用GPL2协议发布。
+* 项目主页 http://www.fefe.de/dietlibc/
+
+#### EGLIBC  
+* EGLIBC是GNU C标准库(glibc)的一个分支，主要是为嵌入式设备进行优化。它采用LGPL协议发布。
+* 项目主页 http://www.eglibc.org/
 	
 ### 1.6 软件包与可替代软件包对比分析
 
@@ -259,42 +264,212 @@ glibc 是Linux系统中最底层的库函数接口，其他的运行库都会依
 
 到目前为止，C标准库规定了29个头文件，如下：
 
-* C89  
+#### C89  
 C89标准规定了15个头文件，分别是 assert.h ctype.h errno.h float.h limits.h locale.h math.h setjmp.h signal.h stdarg.h stddef.h  stdio.h stdlib.h string.h time.h
 
-* NA1  
+#### NA1  
 在95年的修正版NA1中，增补了3个头文件，分别是 iso646.h, wchar.h, and wctype.h
 
-* C99  
+#### C99  
 C99标准增加了6个新的头文件，分别是 complex.h, fenv.h, inttypes.h, stdbool.h, stdint.h, and tgmath.h
 
-* C11  
+#### C11  
 C99标准增加了5个新的头文件，分别是 stdalign.h, stdatomic.h, stdnoreturn.h, threads.h, and uchar.h
 
 ### 3.3 软件包的接口说明
 	建议这部分最多写3页，如果接口很多，挑最重要的接口写2-3页即可，否则工作量将会非常大，不能在本任务的经费支持范围之内。
-	因为主要讨论libc，因此对于glibc中不在libc范畴内的不在这里涉及。
 
-* assert.h
-	- assert(expr) 宏定义
-* ctype.h 
-	- isupper(c) 宏定义
-	- isdigit(c) 宏定义
-	- isspace(c) 宏定义
-* errno.h 
-	- error() 函数声明
-* float.h 
-* limits.h 
-* locale.h 
-* math.h 
-* setjmp.h
-* signal.h
-* stdarg.h
+因为主要讨论libc，因此对于glibc中不在libc范畴内的不在这里涉及。
+
+#### 输入输出 stdio.h
+##### 文件操作函数
+	FILE * fopen (const char *filename, const char *opentype)
+	int fclose (FILE *stream)
+	int fflush (FILE *stream)
+
+##### 格式化输出函数
+	int printf (const char *template, . . . )
+	int fprintf (FILE *stream, const char *template, . . . )
+	int sprintf (char *s, const char *template, . . . )
+
+##### 格式化输入函数
+	int scanf (const char *template, . . . )
+	int fscanf (FILE *stream, const char *template, . . . )
+	int sscanf (const char *s, const char *template, . . . )
+
+##### 字符输入输出函数
+	int fputc (int c, FILE *stream)
+	int fputs (const char *s, FILE *stream)
+	int putc (int c, FILE *stream)
+	int putchar (int c)
+	int puts (const char *s)
+
+	int fgetc (FILE *stream)
+	char * fgets (char *s, int count, FILE *stream)
+	int getc (FILE *stream)
+	int getchar (void)
+	char * gets (char *s)
+	ssize_t getline (char **lineptr, size t *n, FILE *stream)
+
+	int ungetc (int c, FILE *stream)
+
+##### 文件读写函数
+	size_t fread (void *data, size t size, size t count, FILE *stream)
+	size_t fwrite (const void *data, size t size, size t count, FILE *stream)
+
+##### 文件定位函数
+	int fseek (FILE *stream, long int offset, int whence)
+	long int ftell (FILE *stream)
+	void rewind (FILE *stream)
+
+##### 错误处理函数
+	int feof (FILE *stream)
+	int ferror (FILE *stream)
+
+#### 字符类别测试 ctype.h 
+	int islower (int c)
+	int isupper (int c)
+
+	int isalpha (int c)
+	int isdigit (int c)
+	int isalnum (int c)
+	int isxdigit (int c)
+
+	int isspace (int c)
+	int isblank (int c)
+	int isascii (int c)
+
+	int tolower (int c)
+	int toupper (int c)
+	int toascii (int c)
+
+#### 字符串函数 string.h
+	char * stpcpy (char *restrict to, const char *restrict from)
+	char * stpncpy (char *restrict to, const char *restrict from, size_t size)
+
+	char * strcat (char *restrict to, const char *restrict from)
+	char * strncat (char *restrict to, const char *restrict from, size_t size)
+
+	int strcmp (const char *s1, const char *s2)
+	int strncmp (const char *s1, const char *s2, size_t size)
+
+	char * strchr (const char *string, int c)
+	char * strrchr (const char *string, int c)
+
+	size_t strspn (const char *string, const char *skipset)
+	size_t strcspn (const char *string, const char *stopset)
+
+	char * strstr (const char *haystack, const char *needle)
+
+	size_t strlen (const char *s)
+	size_t strnlen (const char *s, size_t maxlen)
+
+	char * strerror (int errnum)
+
+	char * strtok (char *restrict newstring, const char *restrict delimiters)
+	char * strtok_r (char *newstring, const char *delimiters, char **save_ptr
+	char * strsep (char **string_ptr, const char *delimiter)
+
+	char * strpbrk (const char *string, const char *stopset)
+
+#### 数学函数 math.h 
+	double sin (double x)
+	double cos (double x)
+	double tan (double x)
+	double asin (double x)
+	double acos (double x)
+	double atan (double x)
+	double atan2 (double y, double x)
+
+	double sinh (double x)
+	double cosh (double x)
+	double tanh (double x)
+
+
+	double exp (double x)
+	double pow10 (double x)
+
+	double log (double x)
+	double log10 (double x)
+	double log2 (double x)
+
+	double sqrt (double x)
+
+	double ceil (double x)
+	double floor (double x)
+
+	double fabs (double number)
+
+	double frexp (double value, int *exponent)
+
+	double modf (double value, double *integer-part)
+	double fmod (double numerator, double denominator)
+
+#### 实用函数 stdlib.h
+	double atof (const char *string)
+
+	int atoi (const char *string)
+	long int atol (const char *string)
+
+	long int strtol (const char *restrict string, char **restrict tailptr, int base)
+	double strtod (const char *restrict string, char **restrict tailptr)
+	float strtof (const char *string, char **tailptr)
+
+	int rand (void)
+	void srand (unsigned int seed)
+
+	void * malloc (size t size)
+	void * calloc (size t count, size t eltsize)
+	void *realloc (void *addr, size_t size)
+	void free (void *ptr)
+
+	void abort (void)
+	void exit (int status)
+	int atexit (void (*function) (void))
+
+	int system (const char *command)
+	char * getenv (const char *name)
+	int putenv (char *string)
+
+	void * bsearch (const void *key, const void *array, size t count, size t size, comparison_fn_t compare)
+	void qsort (void *array, size t count, size t size, comparison_fn_t compare)
+
+	int abs (int number)
+	long abs (long number)
+
+	div_t div (int numerator, int denominator)
+	ldiv_t ldiv (long int numerator, long int denominator)
+
+#### 诊断 assert.h
+	void assert (int expression)
+
+#### 可变参数表 stdarg.h
+	va_list
+	void va_start (va_list ap, last-required)
+	type va_arg (va_list ap, type)
+	void va_end (va_list ap)
+
+#### 非局部跳转 setjmp.h
+	
+
+#### 信号 signal.h
+
+#### 日期与时间 time.h
+
+#### 具体实现相关 float.h limits.h
+	#define SCHAR_MAX	127
+	#define UCHAR_MAX	255
+	#define SHRT_MAX	32767
+	#define USHRT_MAX	65535
+
+#### errno.h 
+	- error() 函数声明  
+#### locale.h 
+	- 
+
 * stddef.h
-* stdio.h
-* stdlib.h
-* string.h
-* time.h
+
+
 	- ...
 
 * iso646.h
