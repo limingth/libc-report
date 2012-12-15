@@ -385,7 +385,6 @@ C99标准增加了5个新的头文件，分别是 stdalign.h, stdatomic.h, stdno
 	double cosh (double x)
 	double tanh (double x)
 
-
 	double exp (double x)
 	double pow10 (double x)
 
@@ -450,12 +449,19 @@ C99标准增加了5个新的头文件，分别是 stdalign.h, stdatomic.h, stdno
 	void va_end (va_list ap)
 
 #### 非局部跳转 setjmp.h
-	
+	int setjmp (jmp_buf state)
+	void longjmp (jmp buf state, int value)
 
 #### 信号 signal.h
+	sighandler_t signal (int signum, sighandler t action)
+	int raise (int signum)
 
 #### 日期与时间 time.h
-
+	time_t time (time_t *result)
+	
+	struct tm {}
+	struct tm * localtime (const time t *time)
+	
 #### 具体实现相关 float.h limits.h
 	#define SCHAR_MAX	127
 	#define UCHAR_MAX	255
@@ -463,19 +469,21 @@ C99标准增加了5个新的头文件，分别是 stdalign.h, stdatomic.h, stdno
 	#define USHRT_MAX	65535
 
 #### errno.h 
-	- error() 函数声明  
+	volatile int errno	
+	void error (int status, int errnum, const char *format, . . . )
+
 #### locale.h 
-	- 
+	char * setlocale (int category, const char *locale)
+	struct lconv * localeconv (void)
 
-* stddef.h
+#### stddef.h
+	typedef long size_t
+	#define NULL ((void *)0)
 
-
-	- ...
-
+#### 其它头文件略
 * iso646.h
 * wchar.h
 * wctype.h
-	- ...
 
 * complex.h
 * fenv.h
@@ -483,19 +491,12 @@ C99标准增加了5个新的头文件，分别是 stdalign.h, stdatomic.h, stdno
 * stdbool.h
 * stdint.h
 * tgmath.h
-	- ...
 
 * stdalign.h
 * stdatomic.h
 * stdnoreturn.h
 * threads.h
 * uchar.h
-	- ...
-
-
-
-
-
 
 ## 4. 软件包漏洞分析
 	这部分任务书的要求是“针对子任务“Linux、Android操作系统安全漏洞检测”中发现的通用基础软件包安全漏洞的确认分析，包括漏洞产生的原因、漏洞可重现条件及相应的测试用例, 并可进行复现和验证；”，但是此部分待定，暂时不要去写，将根据后续情况经过大家的讨论之后再写。因为漏洞的检测有赖另外一个项目（“Linux、Android操作系统安全漏洞检测”）给出，如果漏洞非常多，我们可能需要分出重要性，分类进行处理。
