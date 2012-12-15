@@ -147,9 +147,9 @@ LGPL允许商业软件通过类库引用(link)方式使用LGPL类库而不需要
 
 ### 1.5 类似的可替代软件包简介overseen
 
-1) uClibc   
-	* uClibc 是一个面向嵌入式Linux系统的小型C标准库。最初uClibc是为了支持uClinux而开发，因为uClinux不支持内存管理单元MMU，因此uClibc也适合于无MMU的硬件系统上。项目的维护者是Erik Andersen，许可证遵从GNU LGPL。2012年5月15日，发布了最新版本uClibc-0.9.33.2。
-	* 项目主页 http://www.uclibc.org/
+* 1) uClibc   
+	- uClibc 是一个面向嵌入式Linux系统的小型C标准库。最初uClibc是为了支持uClinux而开发，因为uClinux不支持内存管理单元MMU，因此uClibc也适合于无MMU的硬件系统上。项目的维护者是Erik Andersen，许可证遵从GNU LGPL。2012年5月15日，发布了最新版本uClibc-0.9.33.2。
+	- 项目主页 http://www.uclibc.org/
 
 2) Newlib  
 	- Newlib 是目前Cygwin所使用的C标准库，是由Cygnus Solutions公司负责开发，在1999年11月15日，Cygnus Solutions宣布将与红帽公司Redhat合并，因此Newlib的主要维护者也是Redhat公司的员工--Corinna Vinschen和Jeff Johnston。Newlib由libc和libm两个库组成，特点是轻量级，速度快，可移植到很多CPU结构上。该项目2011年12月19日发布了最后一个版本1.20.0。
