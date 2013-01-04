@@ -8,6 +8,7 @@ Module-init-tools 软件包分析
 ### 1.1 软件包开发背景与目标
 module-init-tools 软件包主要是为了能够在用户空间向Linux提供加载内核模块所需要使用的工具。
 这个软件包主要是用于2.6系列的内核，最早是为了替换 modutils（例如 modprobe/insmod/modinfo 等）
+modutils 在 2006年9月15号发布了 v2.4 之后就不再更新维护了。 
 
 这里需要了解一些关于Linux内核设计的背景知识。
 
@@ -33,26 +34,11 @@ module-init-tools 软件包主要是为了能够在用户空间向Linux提供加
 正是由于Linux内核支持了内核模块这一特性，从而使得作为宏内核设计的Linux也具备了微内核可以动态加载系统服务的优点。但是因为加载后的内核模块仍然是运行在内核空间，因此如果加载的内核模块出现错误，也同样会引起整个系统崩溃，这一点和微内核设计让系统服务在用户空间运行，通过进程间通信来实现和内核的协同工作，仍然是不同的，这一不同仍然要注意区分。
 
 我们讨论的 module-init-tools 软件包就是为了这一目的而实现的在用户空间运行的加载工具，通过这一工具可以实现我们前面说过的内核模块的加载和卸载功能，这里面也包含了一些其他的常用功能。值得说明的是，加载功能最重要的部分，其实并非是在这个软件包中实现，而是在内核中完成。软件包中的加载代码甚至并没有对需要加载的内核模块做符号解析(也就是向内核空间增添的函数名称和变量名称)，而是直接交给系统调用来完成这一最艰难的部分。
-
-该软件包中主要包含的程序主要可以分为2个功能部分，包括： 
-- insmod/rmmod/lsmod 
-	常用的插入和卸载内核模块，列出已加载模块
-	
-- modinfo/depmod/modprobe 
-	列出模块信息，创建模块依赖关系文件/自动加载相关的模块
-
-使用和编译该软件包的主要步骤是
-
-	tar -zxvf module-init-tools-3.15.tar.gz
-	./configure
-	make 
-	make install
-	./generate-modprobe.conf /etc/modprobe.conf
     
 ### 1.2 软件包维护者信息
 该项目的项目主页在 https://modules.wiki.kernel.org
 从软件包的 AUTHORS 文档中找到，最主要的维护者是 Jon Masters <jcm@jonmasters.org>
-Jon Masters 是从 3.3 版本之后开始参与改软件包的。
+Jon Masters 是从 3.3 版本之后开始参与改软件包的，他的 github 主页在 https://github.com/jonmasters 。
 其中比较积极的，对于软件包版本升级更新作出较多贡献的开发人员还有
 Alan Jenkins <alan-jenkins@tuffmail.co.uk>
 Marco d'Itri <md@linux.it>
@@ -61,12 +47,17 @@ Andreas Robinson <andr345@gmail.com>
 项目开发人员的邮件列表： linux-modules@vger.kernel.org
 
 ### 1.3 软件包所采用的版权协议
-该软件包所采用的版权协议是GPL协议。
+该软件包所采用的版权协议是GPLv2的协议，从下载git包中的COPYING文件中可以获知这一信息。
 
 ### 1.4 软件包的演化历史
+#### modutils
+在2000年到2006年期间，内核普遍采用 modutils 作为管理内核模块的工具，
+modutils 的下载地址 ftp://ftp.kernel.org/pub/linux/utils/kernel/modutils/
+
+#### module-init-tools
 该软件包的下载地址是 http://www.kernel.org/pub/linux/utils/kernel/module-init-tools/
 从这个下载地址上能够看到，最早的版本记录是该软件包的3.0版本，时间是2007年9月5日推出的。
-最后一个能够下载到的版本是3.15版本，时间是2011年1月2日推出的。
+最后一个能够通过 ftp/http 下载到的版本是3.15版本，时间是2011年1月2日推出的。
 
 之后的下载是通过 Git 命令来获得的。
 
@@ -102,21 +93,33 @@ module-init-tools-3.15.tar.gz                    02-Jun-2011 17:43  340K
 3.12 版本中，修改了 Makefile 里面的一些问题；
 3.14 版本及之后的修改，都是在文档 documentation 方面，代码中的修改已经很少了，说明该软件包也是日趋成熟；
 
+#### kmod
 在此之后，这个软件包将会被一个新工具所替代，这个新工具将会基于 libkmod。
+详见 https://www.archlinux.org/news/kmod-replaces-module-init-tools/
+在维护者 Jon Masters 的个人博客主页上，在2011年12月20日也给出了这一声明。
+libkmod 是 kmod 项目的一个子目录，下载地址是 https://github.com/profusion/kmod
 
 ### 1.5 类似的可替代软件包简介overseen
+libkmod 是 module-init-tools 的一个升级，在当前能够找到的唯一和 module-init-tools 有可比性的软件工具。
+目前这个项目主要是由 ProFUSION embedded systems 公司负责维护的，公司主页在 http://profusion.mobi/
+这个公司是一家在巴西的生产飞机上所用的娱乐设备（类似飞机座椅后背上的音视频游戏系统），也包括家用厨房里的智能设备。
+
+libkmod 其实是封装了原来系统调用的接口，替换了一套类似用面向对象思想封装的 kmod 库接口，例如将原来的 
+init_module 替换为 kmod_module_insert_module()，
+delete_module 替换为 kmod_module_remove_module()
+
+从 github 上的 commit 记录来看，该公司的 Lucas De Marchi 是最活跃的，他的 github 主页在 https://github.com/lucasdemarchi
+另一个叫 Dave Reisner (falconindy) 也是经常提交代码的开发者，他的主页在 https://github.com/falconindy
+
+不过这个项目代码的最近一次更新是2012年5月16日，近半年似乎不怎么活跃。
 
 ### 1.6 软件包与可替代软件包对比分析
 
-  对比          应用领域                         采用协议   特点
-  ------------- -------------------------------- ---------- ---------------------------
-  glibc         桌面领域，GNU/Linux操作系统       LGPL       功能全面
-  uClibc        嵌入式领域，uCLinux操作系统       LGPL       主要用在uCLinux系统中
-  Newlib        桌面领域，Cygwin系统              LGPL       具有独特的设计，可移植性强
-  BSD libc      桌面领域，FreeBSD操作系统         BSD        主要用在BSD系统中
-  Bionic libc   手机嵌入式领域，Android操作系统   BSD        主要用在Android系统中
-  dietlibc      各种对体积尺寸要求严格的领域     GPL2       设计非常精巧，适合学习
-  EGLIBC        桌面领域，Ubuntu操作系统          LGPL       主要用在Ubuntu系统中
+  对比               应用领域                    采用协议   特点
+  ----------------- ------------------------- --------  ---------------------------
+  module-init-tools 桌面领域，GNU/Linux操作系统   GPLv2     简单，直接系统调用，无库接口
+  kmod              桌面领域                    GPLv2     采用 libkmod 接口实现          
+  libkmod           二次开发软件包               LGPLv2.1  libkmod 是 kmod 项目的一部分      
 
 2. 软件包与发行版的关系
 -----------------------
@@ -143,17 +146,20 @@ module-init-tools-3.15.tar.gz                    02-Jun-2011 17:43  340K
 
 ### 3.1 软件包的功能说明
 
-glibc 是Linux系统中最底层的库函数接口，其他的运行库都会依赖于这个库。
-它除了封装了Linux系统调用，同时也提供了一些其他必要功能，主要包括：
+该软件包中主要包含的程序主要可以分为2个功能部分，包括： 
+- insmod/rmmod/lsmod 
+	常用的插入内核模块，卸载内核模块，列出已加载模块
+	
+- modinfo/depmod/modprobe 
+	列出模块信息，创建模块依赖关系文件，自动加载相关的模块
 
--   字符串处理 string
--   信号处理 signal
--   本地化 locale
--   数学库 math
--   线程库 linuxthreads
--   动态内存管理 malloc
--   动态加载器 elf
--   C 标准库 libc
+使用和编译该软件包的主要步骤是
+
+	tar -zxvf module-init-tools-3.15.tar.gz
+	./configure
+	make 
+	make install
+	./generate-modprobe.conf /etc/modprobe.conf
 
 ### 3.2 软件包的设计架构
 
@@ -205,6 +211,8 @@ glibc 是Linux系统中最底层的库函数接口，其他的运行库都会依
     建议这部分最多写3页，如果接口很多，挑最重要的接口写2-3页即可，否则工作量将会非常大，不能在本任务的经费支持范围之内。
     
 从底层模块的接口分析：
+
+#### 模块接口说明
 
 * logging 模块接口
 	- 提供 NOFAIL 宏
@@ -262,37 +270,47 @@ glibc 是Linux系统中最底层的库函数接口，其他的运行库都会依
 	/* returns 0 if the name matches a well-known backup pattern */
 	int config_filter(const char *name);
 
-* tables 模块接口
-
 * elfops 模块接口
 	- 通过对 ELF 特定格式文件的 grab 接口
 	- 提供对于32位和64位机器上 ELF 文件的兼容处理
 		
 关键代码
-
+  
 	struct elf_file *grab_elf_file(const char *pathname);
 	void release_elf_file(struct elf_file *file);
 
+* tables 模块接口
+
 * index 模块接口
 
+#### 命令说明
 
+* insmod 命令
+	- 通过系统调用 init_module，完成内核模块的插入
+	
+* rmmod 命令
+	- 通过系统调用 delete_module，完成内核模块的卸载
 
-* insmod 模块
-	init_module
+* lsmod 命令
+	- 通过分析 /proc/modules 文件，列出已经加载的模块名称
 
-* rmmod 模块
-	delete_module	
+* modinfo 命令
+	- 通过分析内核模块文件的 ELF 格式，得出该内核模块的相关信息，例如作者，版本，协议等
+
+* depmod 命令
+	- 创建一个模块的依赖关系列表，写入到同一个路径下的modules.dep文件。
+
+* modprobe 命令
+	- 根据depmod所产生的依赖关系，决定要载入哪些模块。若在载入过程中发生错误，在modprobe会卸载整组的模块。
+	
 
 4. 软件包漏洞分析
 -----------------
 
-这部分任务书的要求是“针对子任务“Linux、Android操作系统安全漏洞检测”中发现的通用基础软件包安全漏洞的确认分析，包括漏洞产生的原因、漏洞可重现条件及相应的测试用例,
-并可进行复现和验证；”，但是此部分待定，暂时不要去写，将根据后续情况经过大家的讨论之后再写。因为漏洞的检测有赖另外一个项目（“Linux、Android操作系统安全漏洞检测”）给出，如果漏洞非常多，我们可能需要分出重要性，分类进行处理。
+-  待定
 
 5. 软件包的依赖关系
 -------------------
-
-这部分请用文字和图说明该软件包的运行还需依赖哪些其他的软件包，其依赖关系不仅要通过阅读文档、代码来获得，更要通过实际的运行验证来获得依赖关系的证据，这一点请慎重处理。
 
 安装依赖于 
 -  Bash, Binutils, Bison, Coreutils, Diffutils, Flex, GCC, Glibc, Grep, M4, Make, Sed
@@ -301,24 +319,29 @@ glibc 是Linux系统中最底层的库函数接口，其他的运行库都会依
 6. 软件包安全性及特别需要说明的问题
 -----------------------------------
 
-本部分请撰写不能包括在上述章节中的其他重要分析成果，特别是和系统安全有关的内容，如果没有请填写“无”。
-
 -   无
 
 7. 软件包分析成果验证方法
 -------------------------
-
-根据任务书，“分析成果进行验证，包括但不限于制作安装包安装测试验证依赖关系、软件包接口测试脚本、可替代软件包兼容性测试验证等。”，具体如何验证后续还有待通过研讨会大家现成讨论确定，但需要在此小节给出进行验证的具体方法和流程的描述，此部分后续在写，暂时空着即可。
 
 -   待定
 
 8. 参考资料
 -----------
 
-GNU libc 项目主页： <http://www.gnu.org/software/libc/>
-
-GNU libc 参考手册： <http://www.gnu.org/software/libc/manual/>
-<http://www.gnu.org/software/libc/manual/pdf/libc.pdf>
-
 Linux 可加载内核模块剖析：
 <https://www.ibm.com/developerworks/cn/linux/l-lkm/>
+
+各版本 module-init-tools 软件包下载地址：
+<http://rpmfind.net/linux/rpm2html/search.php?query=module-init-tools>
+
+维护者博客上关于 libkmod 替换 module-init-tools 声明：
+<http://www.jonmasters.org/blog/2011/12/20/libkmod-replaces-module-init-tools/>
+
+kmod 的官方说明：
+<http://www.politreco.com/2011/12/announce-kmod-1/>
+
+关于 modutiles 的资料:
+ftp://ftp.kernel.org/pub/linux/utils/kernel/modutils/
+http://man.chinaunix.net/linux/lfs/htmlbook/appendixa/modutils.html
+
