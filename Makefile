@@ -2,6 +2,7 @@
 %: 
 	echo making $@.md to $@.pdf
 	pandoc -s $@.md -o $@.tex
+	pandoc $@.md -o $@.html
 	xelatex $@.tex
 	gnome-open $@.pdf
 	
