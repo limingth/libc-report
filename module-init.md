@@ -115,11 +115,11 @@ delete_module 替换为 kmod_module_remove_module()
 
 ### 1.6 软件包与可替代软件包对比分析
 
-  对比               应用领域                    采用协议   特点
-  ----------------- ------------------------- --------  ---------------------------
-  module-init-tools 桌面领域，GNU/Linux操作系统   GPLv2     简单，直接系统调用，无库接口
-  kmod              桌面领域                    GPLv2     采用 libkmod 接口实现          
-  libkmod           二次开发软件包               LGPLv2.1  libkmod 是 kmod 项目的一部分      
+  对比                应用领域                   采用协议      特点
+  ----------------- ------------------------- ----------  ---------------------------
+  module-init-tools  2.6内核                    GPLv2       简单，直接系统调用，无库接口
+  kmod               3.0内核                    GPLv2       采用 libkmod 接口实现          
+  libkmod            二次开发软件包               LGPLv2.1    libkmod 是 kmod 项目的一部分      
 
 2. 软件包与发行版的关系
 -----------------------
@@ -127,18 +127,14 @@ delete_module 替换为 kmod_module_remove_module()
 本小节需要介绍和阐述软件包在不同发行版中的名称、功能、运行环境的异同，除了正文描述以外，最好填下表以便更清晰，建议不超过1页。
 
   -----------------------------------------------------------------------------------------------------------------
-  发行版名称及版本号   软件包在该发行版中的名称   该软件包的版本   该软件包的安装
-  -------------------- -------------------------- ---------------- ------------------------------------------------
-  Ubuntu 10.04         EGLIBC                     2.11.1           sudo apt-get install libc6-dev \
-                                                                   sudo apt-get install glibc-doc
+  发行版名称及版本号        软件包在该发行版中的名称    该软件包的版本      该软件包的安装
+  -------------------- ----------------------- ---------------- ------------------------------------------------
+  Ubuntu 10.04         module-init-tools          3.11.1           sudo apt-get install module-init-tools
 
-  Redhat9              glibc                      2.3.2            rpm -Uvh glibc-kernheaders-2.4-8.34.i386.rpm \
-                                                                   rpm -Uvh glibc-headers-2.3.2-95.3.i386.rpm \
-                                                                   rpm -Uvh glibc-derel-2.3.2-95.3.i386.rpm
+  Fedora 17            module-init-tools          3.16-5.fc17      yum install module-init-tools
 
-  Fedora               glibc                      2.15-23.fc17     yum install glibc-devel.i686 glibc.i686
-
-  OpenSUSE             glibc                      2.3.3            rpm -ivh glibc-devel-2.3.3-98.28.i586.rpm
+  OpenSUSE 12.2        module-init-tools          3.15             rpm -ivh module-init-tools-3.15-3.6.1.x86_64.rpm
+                                                                   zypper install module-init-tools
   -----------------------------------------------------------------------------------------------------------------
 
 3. 软件包的功能、设计架构和接口使用说明
@@ -287,15 +283,19 @@ delete_module 替换为 kmod_module_remove_module()
 
 * insmod 命令
 	- 通过系统调用 init_module，完成内核模块的插入
+	- 系统调用之后，会依次调用 sys_init_module -> load_module 来完成核心的加载功能
 	
 * rmmod 命令
 	- 通过系统调用 delete_module，完成内核模块的卸载
+	- 系统调用之后，会依次调用 sys_delete_module -> free_module 来完成核心的卸载功能
 
 * lsmod 命令
 	- 通过分析 /proc/modules 文件，列出已经加载的模块名称
+	- 主要是使用 strtok 函数，对 /proc/modules 文件的输出信息进行解析
 
 * modinfo 命令
 	- 通过分析内核模块文件的 ELF 格式，得出该内核模块的相关信息，例如作者，版本，协议等
+	- 核心函数 grab_module -> grab_elf_file & grab_file -> 调用 elfops 模块接口
 
 * depmod 命令
 	- 创建一个模块的依赖关系列表，写入到同一个路径下的modules.dep文件。
@@ -306,11 +306,13 @@ delete_module 替换为 kmod_module_remove_module()
 
 4. 软件包漏洞分析
 -----------------
+这部分任务书的要求是“针对子任务“Linux、Android操作系统安全漏洞检测”中发现的通用基础软件包安全漏洞的确认分析，包括漏洞产生的原因、漏洞可重现条件及相应的测试用例, 并可进行复现和验证；”，但是此部分待定，暂时不要去写，将根据后续情况经过大家的讨论之后再写。因为漏洞的检测有赖另外一个项目（“Linux、Android操作系统安全漏洞检测”）给出，如果漏洞非常多，我们可能需要分出重要性，分类进行处理。
 
 -  待定
 
 5. 软件包的依赖关系
 -------------------
+这部分请用文字和图说明该软件包的运行还需依赖哪些其他的软件包，其依赖关系不仅要通过阅读文档、代码来获得，更要通过实际的运行验证来获得依赖关系的证据，这一点请慎重处理。
 
 安装依赖于 
 -  Bash, Binutils, Bison, Coreutils, Diffutils, Flex, GCC, Glibc, Grep, M4, Make, Sed
@@ -318,11 +320,13 @@ delete_module 替换为 kmod_module_remove_module()
 
 6. 软件包安全性及特别需要说明的问题
 -----------------------------------
+本部分请撰写不能包括在上述章节中的其他重要分析成果，特别是和系统安全有关的内容，如果没有请填写“无”。
 
 -   无
 
 7. 软件包分析成果验证方法
 -------------------------
+根据任务书，“分析成果进行验证，包括但不限于制作安装包安装测试验证依赖关系、软件包接口测试脚本、可替代软件包兼容性测试验证等。”，具体如何验证后续还有待通过研讨会大家现成讨论确定，但需要在此小节给出进行验证的具体方法和流程的描述，此部分后续在写，暂时空着即可。
 
 -   待定
 
@@ -342,6 +346,10 @@ kmod 的官方说明：
 <http://www.politreco.com/2011/12/announce-kmod-1/>
 
 关于 modutiles 的资料:
-ftp://ftp.kernel.org/pub/linux/utils/kernel/modutils/
-http://man.chinaunix.net/linux/lfs/htmlbook/appendixa/modutils.html
+<ftp://ftp.kernel.org/pub/linux/utils/kernel/modutils/>
+<http://man.chinaunix.net/linux/lfs/htmlbook/appendixa/modutils.html>
+<http://download.gna.org/pdbv/demo_html/demo_2.0.10/package/modutils_2.4.26-1.2.html>
+
+The Linux Kernel Module Programming Guide 内核模块编程指南
+<http://tldp.org/LDP/lkmpg/2.6/html/lkmpg.html>
 

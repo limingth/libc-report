@@ -8,24 +8,39 @@
     ><h3
       >1.1 软件包开发背景与目标</h3
       ><p
-      >module-init-tools 软件包主要是为了能够在用户空间向Linux提供加载内核模块所需要使用的工具。 这个软件包主要是用于2.6系列的内核，最早是为了替换 modutils（例如 modprobe/insmod/modinfo 等）</p
+      >module-init-tools 软件包主要是为了能够在用户空间向Linux提供加载内核模块所需要使用的工具。 这个软件包主要是用于2.6系列的内核，最早是为了替换 modutils（例如 modprobe/insmod/modinfo 等） modutils 在 2006年9月15号发布了 v2.4 之后就不再更新维护了。</p
       ><p
-      >该软件包中主要包含的程序主要可以分为2个功能部分，包括： - insmod/rmmod/lsmod 常用的插入和卸载内核模块，列出已加载模块</p
+      >这里需要了解一些关于Linux内核设计的背景知识。</p
+      ><p
+      >内核是操作系统设计中最基础的部分，通常一个操作系统都需要包含以下这些功能：</p
       ><ul
       ><li
-	>modinfo/depmod/modprobe 列出模块信息，创建模块依赖关系文件/自动加载相关的模块</li
+	>进程管理</li
+	><li
+	>进程间通讯</li
+	><li
+	>内存管理 (特别是虚拟内存)</li
+	><li
+	>设备驱动</li
+	><li
+	>文件系统</li
+	><li
+	>网络通讯</li
 	></ul
       ><p
-      >使用和编译该软件包的主要步骤是</p
-      ><pre
-      ><code
-	>tar -zxvf module-init-tools-3.15.tar.gz
-./configure
-make 
-make install
-./generate-modprobe.conf /etc/modprobe.conf
-</code
-	></pre
+      >传统的Unix内核是宏内核（也称为单内核）设计(Macro-kernel)，所谓宏内核的意思是所有这些模块都在同一个内核空间上上运行。宏内核是通过提供系统调用(System-Call)来向上层的应用程序提供服务访问点，这些系统调用包含了进程创建，文件读写，设备驱动，内存的分配和释放等。</p
+      ><p
+      >宏内核的问题在于因为所有模块都在同一个地址空间运行，所以如果内核代码中出现一个哪怕是很小的bug也会引起整个系统崩溃，这样带来了安全性上的问题。而微内核(Micro-kernel)的设计则有效的避免了这个问题，虽然可能会随之带来运行效率上的一些损失。</p
+      ><p
+      >微内核的设计只将必要的功能模块放入到内核空间，例如进程间通信(IPC)，调度，基本的输入输出(I/O)和内存管理作为核心部件，而其他的文件系统，设备驱动和网络协议栈等，则在用户模式下作为系统服务进程来运行，因为每个服务都是在自己的地址空间运行，因此互相之间并不能破坏彼此，从而得到了保护。历史上的 Windows NT 就是采用微内核的设计。</p
+      ><p
+      >两种内核设计模式，前者高效，后者稳定灵活。微内核设计中的系统服务可以动态加载插入，非常灵活，这个优点也被作为宏内核代表的Linux的设计者所认同和借鉴，因此从内核的 1.2 版本开始，Linux内核开始引入内核模块的机制。内核模块是Linux内核向外部提供的一个插口，其全称为动态可加载内核模块（Loadable Kernel Module，LKM）。这一机制是Linux内核最重要的创新之一。</p
+      ><p
+      >内核模块是具有独立功能的程序，但通常被编译为后缀是.ko(在2.6版本之前内核模块的后缀为.o)的ELF格式的目标文件，这样的目标文件不能独立运行，需要通过加载工具将它链接到内核中作为内核的一个功能，运行在内核空间。内核模块是实现设备驱动和文件系统的一种常用技巧，通过加载内核模块和卸载内核模块，可以扩展内核的功能，增加系统服务的种类，支持更多的设备驱动。</p
+      ><p
+      >正是由于Linux内核支持了内核模块这一特性，从而使得作为宏内核设计的Linux也具备了微内核可以动态加载系统服务的优点。但是因为加载后的内核模块仍然是运行在内核空间，因此如果加载的内核模块出现错误，也同样会引起整个系统崩溃，这一点和微内核设计让系统服务在用户空间运行，通过进程间通信来实现和内核的协同工作，仍然是不同的，这一不同仍然要注意区分。</p
+      ><p
+      >我们讨论的 module-init-tools 软件包就是为了这一目的而实现的在用户空间运行的加载工具，通过这一工具可以实现我们前面说过的内核模块的加载和卸载功能，这里面也包含了一些其他的常用功能。值得说明的是，加载功能最重要的部分，其实并非是在这个软件包中实现，而是在内核中完成。软件包中的加载代码甚至并没有对需要加载的内核模块做符号解析(也就是向内核空间增添的函数名称和变量名称)，而是直接交给系统调用来完成这一最艰难的部分。</p
       ></div
     ><div id="&#36719;&#20214;&#21253;&#32500;&#25252;&#32773;&#20449;&#24687;"
     ><h3
@@ -40,7 +55,7 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+
 </script
 	><noscript
 	>&#106;&#x63;&#x6d;&#32;&#x61;&#116;&#32;&#106;&#x6f;&#110;&#x6d;&#x61;&#x73;&#116;&#x65;&#114;&#x73;&#32;&#100;&#x6f;&#116;&#32;&#x6f;&#114;&#x67;</noscript
-	> Jon Masters 是从 3.3 版本之后开始参与改软件包的。 其中比较积极的，对于软件包版本升级更新作出较多贡献的开发人员还有 Alan Jenkins <script type="text/javascript"
+	> Jon Masters 是从 3.3 版本之后开始参与改软件包的，他的 github 主页在 https://github.com/jonmasters 。 其中比较积极的，对于软件包版本升级更新作出较多贡献的开发人员还有 Alan Jenkins <script type="text/javascript"
 	>
 <!--
 h='&#116;&#x75;&#102;&#102;&#x6d;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#46;&#x75;&#x6b;';a='&#64;';n='&#x61;&#108;&#x61;&#110;&#x2d;&#106;&#x65;&#110;&#x6b;&#x69;&#110;&#x73;';e=n+a+h;
@@ -75,43 +90,65 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+
     ><h3
       >1.3 软件包所采用的版权协议</h3
       ><p
-      >该软件包所采用的版权协议是GPL协议。</p
+      >该软件包所采用的版权协议是GPLv2的协议，从下载git包中的COPYING文件中可以获知这一信息。</p
       ></div
     ><div id="&#36719;&#20214;&#21253;&#30340;&#28436;&#21270;&#21382;&#21490;"
     ><h3
       >1.4 软件包的演化历史</h3
-      ><p
-      >该软件包的下载地址是 http://www.kernel.org/pub/linux/utils/kernel/module-init-tools/ 从这个下载地址上能够看到，最早的版本记录是该软件包的3.0版本，时间是2007年9月5日推出的。 最后一个能够下载到的版本是3.15版本，时间是2011年1月2日推出的。</p
-      ><p
-      >之后的下载是通过 Git 命令来获得的。</p
-      ><pre
-      ><code
-	>git://git.kernel.org/pub/scm/utils/kernel/module-init-tools/module-init-tools.git
+      ><div id="modutils"
+      ><h4
+	>modutils</h4
+	><p
+	>在2000年到2006年期间，内核普遍采用 modutils 作为管理内核模块的工具， modutils 的下载地址 ftp://ftp.kernel.org/pub/linux/utils/kernel/modutils/</p
+	></div
+      ><div id="module-init-tools"
+      ><h4
+	>module-init-tools</h4
+	><p
+	>该软件包的下载地址是 http://www.kernel.org/pub/linux/utils/kernel/module-init-tools/ 从这个下载地址上能够看到，最早的版本记录是该软件包的3.0版本，时间是2007年9月5日推出的。 最后一个能够通过 ftp/http 下载到的版本是3.15版本，时间是2011年1月2日推出的。</p
+	><p
+	>之后的下载是通过 Git 命令来获得的。</p
+	><pre
+	><code
+	  >git://git.kernel.org/pub/scm/utils/kernel/module-init-tools/module-init-tools.git
 </code
-	></pre
-      ><p
-      >从3.1到最新的3.15版本的更新时间，依次是 module-init-tools-3.4.tar.gz 07-Oct-2007 22:09 276K<br
-	 />module-init-tools-3.5.tar.gz 13-Oct-2008 09:13 251K<br
-	 />module-init-tools-3.7.tar.gz 08-Apr-2009 22:08 828K<br
-	 />module-init-tools-3.8.tar.gz 30-Apr-2009 20:37 890K<br
-	 />module-init-tools-3.9.tar.gz 27-May-2009 18:43 229K<br
-	 />module-init-tools-3.10.tar.gz 16-Jul-2009 08:56 1.0M<br
-	 />module-init-tools-3.11-rc1.tar.gz 02-Oct-2009 18:37 130K<br
-	 />module-init-tools-3.11.1.tar.gz 21-Oct-2009 04:10 235K<br
-	 />module-init-tools-3.12.tar.gz 07-Jun-2010 08:06 1.0M<br
-	 />module-init-tools-3.13.tar.gz 31-May-2011 04:56 1.0M<br
-	 />module-init-tools-3.14.tar.gz 02-Jun-2011 06:38 340K<br
-	 />module-init-tools-3.15.tar.gz 02-Jun-2011 17:43 340K</p
-      ><p
-      >从该软件的 ChangeLog 中能够看到的记录是从0.7a版本，以下对各个版本中比较重要的特性做一说明： 0.7a 版本中，增加了对 /etc/modprobe.conf 的支持； 0.8 版本中，增加了 insmod -p -s -f 参数的支持； 0.9.4 版本中，增加了 modprobe -l -t -a 参数支持； 0.9.14 版本中，支持通过 stdin 来插入模块，例如 zcat foo.ko.gz | insmod -</p
-      ><p
-      >比较特别的是，在 ChangeLog 中，版本号从 0.9.14 直接变为 3.0 Version. 3.0 版本中，支持 -a mod1 mod2 同时加载2个模块； 3.2 版本中，modinfo 可以支持 2.6.11 内核； 3.4 版本中，modprobe 可以处理内核命令行 (kernel command line)； 3.6 版本中，开始使用 /sys/module 而不是 /proc/modules； 3.8 版本中，zlib 允许使用动态链接； 3.10 版本中，去掉了一些参数选项的处理； 3.12 版本中，修改了 Makefile 里面的一些问题； 3.14 版本及之后的修改，都是在文档 documentation 方面，代码中的修改已经很少了，说明该软件包也是日趋成熟；</p
-      ><p
-      >在此之后，这个软件包将会被一个新工具所替代，这个新工具将会基于 libkmod。</p
+	  ></pre
+	><p
+	>从3.1到最新的3.15版本的更新时间，依次是 module-init-tools-3.4.tar.gz 07-Oct-2007 22:09 276K<br
+	   />module-init-tools-3.5.tar.gz 13-Oct-2008 09:13 251K<br
+	   />module-init-tools-3.7.tar.gz 08-Apr-2009 22:08 828K<br
+	   />module-init-tools-3.8.tar.gz 30-Apr-2009 20:37 890K<br
+	   />module-init-tools-3.9.tar.gz 27-May-2009 18:43 229K<br
+	   />module-init-tools-3.10.tar.gz 16-Jul-2009 08:56 1.0M<br
+	   />module-init-tools-3.11-rc1.tar.gz 02-Oct-2009 18:37 130K<br
+	   />module-init-tools-3.11.1.tar.gz 21-Oct-2009 04:10 235K<br
+	   />module-init-tools-3.12.tar.gz 07-Jun-2010 08:06 1.0M<br
+	   />module-init-tools-3.13.tar.gz 31-May-2011 04:56 1.0M<br
+	   />module-init-tools-3.14.tar.gz 02-Jun-2011 06:38 340K<br
+	   />module-init-tools-3.15.tar.gz 02-Jun-2011 17:43 340K</p
+	><p
+	>从该软件的 ChangeLog 中能够看到的记录是从0.7a版本，以下对各个版本中比较重要的特性做一说明： 0.7a 版本中，增加了对 /etc/modprobe.conf 的支持； 0.8 版本中，增加了 insmod -p -s -f 参数的支持； 0.9.4 版本中，增加了 modprobe -l -t -a 参数支持； 0.9.14 版本中，支持通过 stdin 来插入模块，例如 zcat foo.ko.gz | insmod -</p
+	><p
+	>比较特别的是，在 ChangeLog 中，版本号从 0.9.14 直接变为 3.0 Version. 3.0 版本中，支持 -a mod1 mod2 同时加载2个模块； 3.2 版本中，modinfo 可以支持 2.6.11 内核； 3.4 版本中，modprobe 可以处理内核命令行 (kernel command line)； 3.6 版本中，开始使用 /sys/module 而不是 /proc/modules； 3.8 版本中，zlib 允许使用动态链接； 3.10 版本中，去掉了一些参数选项的处理； 3.12 版本中，修改了 Makefile 里面的一些问题； 3.14 版本及之后的修改，都是在文档 documentation 方面，代码中的修改已经很少了，说明该软件包也是日趋成熟；</p
+	></div
+      ><div id="kmod"
+      ><h4
+	>kmod</h4
+	><p
+	>在此之后，这个软件包将会被一个新工具所替代，这个新工具将会基于 libkmod。 详见 https://www.archlinux.org/news/kmod-replaces-module-init-tools/ 在维护者 Jon Masters 的个人博客主页上，在2011年12月20日也给出了这一声明。 libkmod 是 kmod 项目的一个子目录，下载地址是 https://github.com/profusion/kmod</p
+	></div
       ></div
     ><div id="&#31867;&#20284;&#30340;&#21487;&#26367;&#20195;&#36719;&#20214;&#21253;&#31616;&#20171;overseen"
     ><h3
       >1.5 类似的可替代软件包简介overseen</h3
+      ><p
+      >libkmod 是 module-init-tools 的一个升级，在当前能够找到的唯一和 module-init-tools 有可比性的软件工具。 目前这个项目主要是由 ProFUSION embedded systems 公司负责维护的，公司主页在 http://profusion.mobi/ 这个公司是一家在巴西的生产飞机上所用的娱乐设备（类似飞机座椅后背上的音视频游戏系统），也包括家用厨房里的智能设备。</p
+      ><p
+      >libkmod 其实是封装了原来系统调用的接口，替换了一套类似用面向对象思想封装的 kmod 库接口，例如将原来的 init_module 替换为 kmod_module_insert_module()， delete_module 替换为 kmod_module_remove_module()</p
+      ><p
+      >从 github 上的 commit 记录来看，该公司的 Lucas De Marchi 是最活跃的，他的 github 主页在 https://github.com/lucasdemarchi 另一个叫 Dave Reisner (falconindy) 也是经常提交代码的开发者，他的主页在 https://github.com/falconindy</p
+      ><p
+      >不过这个项目代码的最近一次更新是2012年5月16日，近半年似乎不怎么活跃。</p
       ></div
     ><div id="&#36719;&#20214;&#21253;&#19982;&#21487;&#26367;&#20195;&#36719;&#20214;&#21253;&#23545;&#27604;&#20998;&#26512;"
     ><h3
@@ -120,11 +157,11 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+
       ><thead
 	><tr class="header"
 	  ><th align="left"
-	    >对比 应用</th
+	    >对比</th
 	    ><th align="left"
-	    >领域 采用协议</th
-	    ><th align="center"
-	    >特点</th
+	    >应用领域 采用协</th
+	    ><th align="left"
+	    >议 特点</th
 	    ><th align="left"
 	    ></th
 	    ></tr
@@ -132,73 +169,33 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+
 	><tbody
 	><tr class="odd"
 	  ><td align="left"
-	    >glibc</td
+	    >module-init-tools</td
 	    ><td align="left"
-	    >桌面领域，GNU/Linux操作系统 LGPL</td
-	    ><td align="center"
-	    >功能全面</td
+	    >2.6内核</td
 	    ><td align="left"
-	    ></td
+	    >GPLv2</td
+	    ><td align="left"
+	    >简单，直接系统调用，无库接口</td
 	    ></tr
 	  ><tr class="even"
 	  ><td align="left"
-	    >uClibc</td
+	    >kmod</td
 	    ><td align="left"
-	    >嵌入式领域，uCLinux操作系统 LGPL</td
-	    ><td align="center"
-	    >主要用在uCLin</td
+	    >3.0内核</td
 	    ><td align="left"
-	    >ux系统中</td
+	    >GPLv2</td
+	    ><td align="left"
+	    >采用 libkmod 接口实现</td
 	    ></tr
 	  ><tr class="odd"
 	  ><td align="left"
-	    >Newlib</td
+	    >libkmod</td
 	    ><td align="left"
-	    >桌面领域，Cygwin系统 LGPL</td
-	    ><td align="center"
-	    >具有独特的设</td
+	    >二次开发软件包 LGP</td
 	    ><td align="left"
-	    >计，可移植性强</td
-	    ></tr
-	  ><tr class="even"
-	  ><td align="left"
-	    >BSD libc</td
+	    >Lv2.1 lib</td
 	    ><td align="left"
-	    >桌面领域，FreeBSD操作系统 BSD</td
-	    ><td align="center"
-	    >主要用在BSD系</td
-	    ><td align="left"
-	    >统中</td
-	    ></tr
-	  ><tr class="odd"
-	  ><td align="left"
-	    >Bionic libc</td
-	    ><td align="left"
-	    >手机嵌入式领域，Android操作系统 BSD</td
-	    ><td align="center"
-	    >主要用在Android</td
-	    ><td align="left"
-	    >系统中</td
-	    ></tr
-	  ><tr class="even"
-	  ><td align="left"
-	    >dietlibc</td
-	    ><td align="left"
-	    >各种对体积尺寸要求严格的领域 GPL2 设计非</td
-	    ><td align="center"
-	    >常精巧，适合学习</td
-	    ><td align="left"
-	    ></td
-	    ></tr
-	  ><tr class="odd"
-	  ><td align="left"
-	    >EGLIBC</td
-	    ><td align="left"
-	    >桌面领域，Ubuntu操作系统 LGPL</td
-	    ><td align="center"
-	    >主要用在Ubun</td
-	    ><td align="left"
-	    >tu系统中</td
+	    >kmod 是 kmod 项目的一部分</td
 	    ></tr
 	  ></tbody
 	></table
@@ -211,17 +208,17 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+
     >本小节需要介绍和阐述软件包在不同发行版中的名称、功能、运行环境的异同，除了正文描述以外，最好填下表以便更清晰，建议不超过1页。</p
     ><table
     ><col width="18%"
-       /><col width="23%"
-       /><col width="14%"
-       /><col width="41%"
+       /><col width="21%"
+       /><col width="15%"
+       /><col width="42%"
        /><thead
       ><tr class="header"
 	><th align="left"
-	  >发行版名称及版本号 软件包在该发行版中</th
+	  >发行版名称及版本号 软件包在</th
 	  ><th align="left"
-	  >的名称 该软件包的版本 该软件包的安装</th
-	  ><th align="left"
-	  ></th
+	  >该发行版中的名称 该软件包的版本</th
+	  ><th align="center"
+	  >该软件包的安装</th
 	  ><th align="left"
 	  ></th
 	  ></tr
@@ -231,44 +228,31 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+
 	><td align="left"
 	  >Ubuntu 10.04</td
 	  ><td align="left"
-	  >EGLIBC</td
+	  >module-init-tools</td
+	  ><td align="center"
+	  >3.11.1</td
 	  ><td align="left"
-	  >2.11.1</td
-	  ><td align="left"
-	  >sudo apt-get install libc6-dev <br
-	     />sudo apt-get install glibc-doc</td
+	  >sudo apt-get install module-init-tools</td
 	  ></tr
 	><tr class="even"
 	><td align="left"
-	  >Redhat9</td
+	  >Fedora 17</td
 	  ><td align="left"
-	  >glibc</td
+	  >module-init-tools</td
+	  ><td align="center"
+	  >3.16-5.fc17</td
 	  ><td align="left"
-	  >2.3.2</td
-	  ><td align="left"
-	  >rpm -Uvh glibc-kernheaders-2.4-8.34.i386.rpm <br
-	     />rpm -Uvh glibc-headers-2.3.2-95.3.i386.rpm <br
-	     />rpm -Uvh glibc-derel-2.3.2-95.3.i386.rpm</td
+	  >yum install module-init-tools</td
 	  ></tr
 	><tr class="odd"
 	><td align="left"
-	  >Fedora</td
+	  >OpenSUSE 12.2</td
 	  ><td align="left"
-	  >glibc</td
+	  >module-init-tools</td
+	  ><td align="center"
+	  >3.15</td
 	  ><td align="left"
-	  >2.15-23.fc17</td
-	  ><td align="left"
-	  >yum install glibc-devel.i686 glibc.i686</td
-	  ></tr
-	><tr class="even"
-	><td align="left"
-	  >OpenSUSE</td
-	  ><td align="left"
-	  >glibc</td
-	  ><td align="left"
-	  >2.3.3</td
-	  ><td align="left"
-	  >rpm -ivh glibc-devel-2.3.3-98.28.i586.rpm</td
+	  >rpm -ivh module-init-tools-3.15-3.6.1.x86_64.rpm zypper install module-init-tools</td
 	  ></tr
 	></tbody
       ></table
@@ -280,25 +264,22 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+
     ><h3
       >3.1 软件包的功能说明</h3
       ><p
-      >glibc 是Linux系统中最底层的库函数接口，其他的运行库都会依赖于这个库。 它除了封装了Linux系统调用，同时也提供了一些其他必要功能，主要包括：</p
+      >该软件包中主要包含的程序主要可以分为2个功能部分，包括： - insmod/rmmod/lsmod 常用的插入内核模块，卸载内核模块，列出已加载模块</p
       ><ul
       ><li
-	>字符串处理 string</li
-	><li
-	>信号处理 signal</li
-	><li
-	>本地化 locale</li
-	><li
-	>数学库 math</li
-	><li
-	>线程库 linuxthreads</li
-	><li
-	>动态内存管理 malloc</li
-	><li
-	>动态加载器 elf</li
-	><li
-	>C 标准库 libc</li
+	>modinfo/depmod/modprobe 列出模块信息，创建模块依赖关系文件，自动加载相关的模块</li
 	></ul
+      ><p
+      >使用和编译该软件包的主要步骤是</p
+      ><pre
+      ><code
+	>tar -zxvf module-init-tools-3.15.tar.gz
+./configure
+make 
+make install
+./generate-modprobe.conf /etc/modprobe.conf
+</code
+	></pre
       ></div
     ><div id="&#36719;&#20214;&#21253;&#30340;&#35774;&#35745;&#26550;&#26500;"
     ><h3
@@ -401,21 +382,24 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+
 	></pre
       ><p
       >从底层模块的接口分析：</p
-      ><ul
-      ><li
-	>logging 模块接口<ul
-	  ><li
-	    >提供 NOFAIL 宏</li
+      ><div id="&#27169;&#22359;&#25509;&#21475;&#35828;&#26126;"
+      ><h4
+	>模块接口说明</h4
+	><ul
+	><li
+	  >logging 模块接口<ul
 	    ><li
-	    >提供打印不同级别信息的接口 info()/warn()/error()/fatal()</li
-	    ></ul
-	  ></li
-	></ul
-      ><p
-      >关键代码</p
-      ><pre
-      ><code
-	>#define NOFAIL(ptr)  do_nofail((ptr), __FILE__, __LINE__, #ptr)
+	      >提供 NOFAIL 宏</li
+	      ><li
+	      >提供打印不同级别信息的接口 info()/warn()/error()/fatal()</li
+	      ></ul
+	    ></li
+	  ></ul
+	><p
+	>关键代码</p
+	><pre
+	><code
+	  >#define NOFAIL(ptr)  do_nofail((ptr), __FILE__, __LINE__, #ptr)
 
 #define nofail_asprintf(ptr, ...)               \
     do { if (asprintf((ptr), __VA_ARGS__) &lt; 0)      \
@@ -431,111 +415,158 @@ static inline void *do_nofail(void *ptr, const char *file, int line, const char 
     return ptr;
 }
 </code
-	></pre
-      ><ul
-      ><li
-	>utils 模块接口<ul
-	  ><li
-	    >提供常用的一些函数接口和宏定义，例如 my_basename(), streq(), strstarts()</li
-	    ></ul
-	  ></li
-	></ul
-      ><p
-      >关键代码</p
-      ><pre
-      ><code
-	>char *my_basename(const char *path);    
+	  ></pre
+	><ul
+	><li
+	  >utils 模块接口<ul
+	    ><li
+	      >提供常用的一些函数接口和宏定义，例如 my_basename(), streq(), strstarts()</li
+	      ></ul
+	    ></li
+	  ></ul
+	><p
+	>关键代码</p
+	><pre
+	><code
+	  >char *my_basename(const char *path);    
 void filename2modname(char *modname, const char *filename);
 
 #define streq(a,b) (strcmp((a),(b)) == 0)
 #define strstarts(a,start) (strncmp((a),(start), strlen(start)) == 0)
 </code
-	></pre
-      ><ul
-      ><li
-	>zlibsupport 模块接口<ul
-	  ><li
-	    >提供 grab 文件接口，将文件内容（可能是压缩后的）映射到内存缓冲区 buffer</li
+	  ></pre
+	><ul
+	><li
+	  >zlibsupport 模块接口<ul
 	    ><li
-	    >需要用到 zlib 库的支持</li
-	    ></ul
-	  ></li
-	></ul
-      ><p
-      >关键代码</p
-      ><pre
-      ><code
-	>/* Grab file.  Decompresses if that is supported.  Returns NULL on error. */
+	      >提供 grab 文件接口，将文件内容（可能是压缩后的）映射到内存缓冲区 buffer</li
+	      ><li
+	      >需要用到 zlib 库的支持</li
+	      ></ul
+	    ></li
+	  ></ul
+	><p
+	>关键代码</p
+	><pre
+	><code
+	  >/* Grab file.  Decompresses if that is supported.  Returns NULL on error. */
 extern void *grab_file(const char *filename, unsigned long *size);
 extern void *grab_fd(int fd, unsigned long *size);
 
 /* Free it up. */
 extern void release_file(void *data, unsigned long size);
 </code
-	></pre
-      ><ul
-      ><li
-	>config_filter 模块接口</li
-	></ul
-      ><p
-      >关键代码</p
-      ><pre
-      ><code
-	>/* returns 0 if the name matches a well-known backup pattern */
+	  ></pre
+	><ul
+	><li
+	  >config_filter 模块接口</li
+	  ></ul
+	><p
+	>关键代码</p
+	><pre
+	><code
+	  >/* returns 0 if the name matches a well-known backup pattern */
 int config_filter(const char *name);
 </code
-	></pre
-      ><ul
-      ><li
-	><p
-	  >tables 模块接口</p
-	  ></li
+	  ></pre
+	><ul
 	><li
-	>elfops 模块接口<ul
-	  ><li
-	    >通过对 ELF 特定格式文件的 grab 接口</li
+	  >elfops 模块接口<ul
 	    ><li
-	    >提供对于32位和64位机器上 ELF 文件的兼容处理</li
-	    ></ul
-	  ></li
-	></ul
-      ><p
-      >关键代码</p
-      ><pre
-      ><code
-	>struct elf_file *grab_elf_file(const char *pathname);
+	      >通过对 ELF 特定格式文件的 grab 接口</li
+	      ><li
+	      >提供对于32位和64位机器上 ELF 文件的兼容处理</li
+	      ></ul
+	    ></li
+	  ></ul
+	><p
+	>关键代码</p
+	><pre
+	><code
+	  >struct elf_file *grab_elf_file(const char *pathname);
 void release_elf_file(struct elf_file *file);
 </code
-	></pre
-      ><ul
-      ><li
-	><p
-	  >index 模块接口</p
-	  ></li
+	  ></pre
+	><ul
 	><li
-	><p
-	  >insmod 模块 init_module</p
-	  ></li
+	  ><p
+	    >tables 模块接口</p
+	    ></li
+	  ><li
+	  ><p
+	    >index 模块接口</p
+	    ></li
+	  ></ul
+	></div
+      ><div id="&#21629;&#20196;&#35828;&#26126;"
+      ><h4
+	>命令说明</h4
+	><ul
 	><li
+	  >insmod 命令<ul
+	    ><li
+	      >通过系统调用 init_module，完成内核模块的插入</li
+	      ><li
+	      >系统调用之后，会依次调用 sys_init_module -&gt; load_module 来完成核心的加载功能</li
+	      ></ul
+	    ></li
+	  ><li
+	  >rmmod 命令<ul
+	    ><li
+	      >通过系统调用 delete_module，完成内核模块的卸载</li
+	      ><li
+	      >系统调用之后，会依次调用 sys_delete_module -&gt; free_module 来完成核心的卸载功能</li
+	      ></ul
+	    ></li
+	  ><li
+	  >lsmod 命令<ul
+	    ><li
+	      >通过分析 /proc/modules 文件，列出已经加载的模块名称</li
+	      ><li
+	      >主要是使用 strtok 函数，对 /proc/modules 文件的输出信息进行解析</li
+	      ></ul
+	    ></li
+	  ><li
+	  >modinfo 命令<ul
+	    ><li
+	      >通过分析内核模块文件的 ELF 格式，得出该内核模块的相关信息，例如作者，版本，协议等</li
+	      ><li
+	      >核心函数 grab_module -&gt; grab_elf_file &amp; grab_file -&gt; 调用 elfops 模块接口</li
+	      ></ul
+	    ></li
+	  ><li
+	  >depmod 命令<ul
+	    ><li
+	      >创建一个模块的依赖关系列表，写入到同一个路径下的modules.dep文件。</li
+	      ></ul
+	    ></li
+	  ><li
+	  >modprobe 命令<ul
+	    ><li
+	      >根据depmod所产生的依赖关系，决定要载入哪些模块。若在载入过程中发生错误，在modprobe会卸载整组的模块。</li
+	      ></ul
+	    ></li
+	  ><li
+	  ><h2
+	    >软件包漏洞分析</h2
+	    ><p
+	    >这部分任务书的要求是“针对子任务“Linux、Android操作系统安全漏洞检测”中发现的通用基础软件包安全漏洞的确认分析，包括漏洞产生的原因、漏洞可重现条件及相应的测试用例, 并可进行复现和验证；”，但是此部分待定，暂时不要去写，将根据后续情况经过大家的讨论之后再写。因为漏洞的检测有赖另外一个项目（“Linux、Android操作系统安全漏洞检测”）给出，如果漏洞非常多，我们可能需要分出重要性，分类进行处理。</p
+	    ></li
+	  ><li
+	  ><p
+	    >待定</p
+	    ></li
+	  ><li
+	  ><h2
+	    >软件包的依赖关系</h2
+	    ><p
+	    >这部分请用文字和图说明该软件包的运行还需依赖哪些其他的软件包，其依赖关系不仅要通过阅读文档、代码来获得，更要通过实际的运行验证来获得依赖关系的证据，这一点请慎重处理。</p
+	    ></li
+	  ></ul
 	><p
-	  >rmmod 模块 delete_module</p
-	  ></li
-	><li
-	><h2
-	  >软件包漏洞分析</h2
-	  ></li
-	></ul
-      ><p
-      >这部分任务书的要求是“针对子任务“Linux、Android操作系统安全漏洞检测”中发现的通用基础软件包安全漏洞的确认分析，包括漏洞产生的原因、漏洞可重现条件及相应的测试用例, 并可进行复现和验证；”，但是此部分待定，暂时不要去写，将根据后续情况经过大家的讨论之后再写。因为漏洞的检测有赖另外一个项目（“Linux、Android操作系统安全漏洞检测”）给出，如果漏洞非常多，我们可能需要分出重要性，分类进行处理。</p
+	>安装依赖于 - Bash, Binutils, Bison, Coreutils, Diffutils, Flex, GCC, Glibc, Grep, M4, Make, Sed</p
+	></div
       ></div
-    ></div
-  ><div id="&#36719;&#20214;&#21253;&#30340;&#20381;&#36182;&#20851;&#31995;"
-  ><h2
-    >5. 软件包的依赖关系</h2
-    ><p
-    >这部分请用文字和图说明该软件包的运行还需依赖哪些其他的软件包，其依赖关系不仅要通过阅读文档、代码来获得，更要通过实际的运行验证来获得依赖关系的证据，这一点请慎重处理。</p
-    ><p
-    >安装依赖于 - Bash, Binutils, Bison, Coreutils, Diffutils, Flex, GCC, Glibc, Grep, M4, Make, Sed</p
     ></div
   ><div id="&#36719;&#20214;&#21253;&#23433;&#20840;&#24615;&#21450;&#29305;&#21035;&#38656;&#35201;&#35828;&#26126;&#30340;&#38382;&#39064;"
   ><h2
@@ -550,12 +581,10 @@ void release_elf_file(struct elf_file *file);
       ><li
       ><h2
 	>软件包分析成果验证方法</h2
+	><p
+	>根据任务书，“分析成果进行验证，包括但不限于制作安装包安装测试验证依赖关系、软件包接口测试脚本、可替代软件包兼容性测试验证等。”，具体如何验证后续还有待通过研讨会大家现成讨论确定，但需要在此小节给出进行验证的具体方法和流程的描述，此部分后续在写，暂时空着即可。</p
 	></li
-      ></ul
-    ><p
-    >根据任务书，“分析成果进行验证，包括但不限于制作安装包安装测试验证依赖关系、软件包接口测试脚本、可替代软件包兼容性测试验证等。”，具体如何验证后续还有待通过研讨会大家现成讨论确定，但需要在此小节给出进行验证的具体方法和流程的描述，此部分后续在写，暂时空着即可。</p
-    ><ul
-    ><li
+      ><li
       ><p
 	>待定</p
 	></li
@@ -565,19 +594,47 @@ void release_elf_file(struct elf_file *file);
 	></li
       ></ul
     ><p
-    >GNU libc 项目主页： <a href="http://www.gnu.org/software/libc/"
+    >Linux 可加载内核模块剖析： <a href="https://www.ibm.com/developerworks/cn/linux/l-lkm/"
       ><code
-	>http://www.gnu.org/software/libc/</code
+	>https://www.ibm.com/developerworks/cn/linux/l-lkm/</code
 	></a
       ></p
     ><p
-    >GNU libc 参考手册： <a href="http://www.gnu.org/software/libc/manual/"
+    >各版本 module-init-tools 软件包下载地址： <a href="http://rpmfind.net/linux/rpm2html/search.php?query=module-init-tools"
       ><code
-	>http://www.gnu.org/software/libc/manual/</code
+	>http://rpmfind.net/linux/rpm2html/search.php?query=module-init-tools</code
 	></a
-      > <a href="http://www.gnu.org/software/libc/manual/pdf/libc.pdf"
+      ></p
+    ><p
+    >维护者博客上关于 libkmod 替换 module-init-tools 声明： <a href="http://www.jonmasters.org/blog/2011/12/20/libkmod-replaces-module-init-tools/"
       ><code
-	>http://www.gnu.org/software/libc/manual/pdf/libc.pdf</code
+	>http://www.jonmasters.org/blog/2011/12/20/libkmod-replaces-module-init-tools/</code
+	></a
+      ></p
+    ><p
+    >kmod 的官方说明： <a href="http://www.politreco.com/2011/12/announce-kmod-1/"
+      ><code
+	>http://www.politreco.com/2011/12/announce-kmod-1/</code
+	></a
+      ></p
+    ><p
+    >关于 modutiles 的资料: <a href="ftp://ftp.kernel.org/pub/linux/utils/kernel/modutils/"
+      ><code
+	>ftp://ftp.kernel.org/pub/linux/utils/kernel/modutils/</code
+	></a
+      > <a href="http://man.chinaunix.net/linux/lfs/htmlbook/appendixa/modutils.html"
+      ><code
+	>http://man.chinaunix.net/linux/lfs/htmlbook/appendixa/modutils.html</code
+	></a
+      > <a href="http://download.gna.org/pdbv/demo_html/demo_2.0.10/package/modutils_2.4.26-1.2.html"
+      ><code
+	>http://download.gna.org/pdbv/demo_html/demo_2.0.10/package/modutils_2.4.26-1.2.html</code
+	></a
+      ></p
+    ><p
+    >The Linux Kernel Module Programming Guide 内核模块编程指南 <a href="http://tldp.org/LDP/lkmpg/2.6/html/lkmpg.html"
+      ><code
+	>http://tldp.org/LDP/lkmpg/2.6/html/lkmpg.html</code
 	></a
       ></p
     ></div
