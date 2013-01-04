@@ -1,0 +1,585 @@
+<div id="module-init-tools-&#36719;&#20214;&#21253;&#20998;&#26512;"
+><h1
+  >Module-init-tools 软件包分析</h1
+  ><div id="&#36719;&#20214;&#21253;&#22522;&#26412;&#20449;&#24687;"
+  ><h2
+    >1. 软件包基本信息</h2
+    ><div id="&#36719;&#20214;&#21253;&#24320;&#21457;&#32972;&#26223;&#19982;&#30446;&#26631;"
+    ><h3
+      >1.1 软件包开发背景与目标</h3
+      ><p
+      >module-init-tools 软件包主要是为了能够在用户空间向Linux提供加载内核模块所需要使用的工具。 这个软件包主要是用于2.6系列的内核，最早是为了替换 modutils（例如 modprobe/insmod/modinfo 等）</p
+      ><p
+      >该软件包中主要包含的程序主要可以分为2个功能部分，包括： - insmod/rmmod/lsmod 常用的插入和卸载内核模块，列出已加载模块</p
+      ><ul
+      ><li
+	>modinfo/depmod/modprobe 列出模块信息，创建模块依赖关系文件/自动加载相关的模块</li
+	></ul
+      ><p
+      >使用和编译该软件包的主要步骤是</p
+      ><pre
+      ><code
+	>tar -zxvf module-init-tools-3.15.tar.gz
+./configure
+make 
+make install
+./generate-modprobe.conf /etc/modprobe.conf
+</code
+	></pre
+      ></div
+    ><div id="&#36719;&#20214;&#21253;&#32500;&#25252;&#32773;&#20449;&#24687;"
+    ><h3
+      >1.2 软件包维护者信息</h3
+      ><p
+      >该项目的项目主页在 https://modules.wiki.kernel.org 从软件包的 AUTHORS 文档中找到，最主要的维护者是 Jon Masters <script type="text/javascript"
+	>
+<!--
+h='&#106;&#x6f;&#110;&#x6d;&#x61;&#x73;&#116;&#x65;&#114;&#x73;&#46;&#x6f;&#114;&#x67;';a='&#64;';n='&#106;&#x63;&#x6d;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+'a'+'>');
+// -->
+</script
+	><noscript
+	>&#106;&#x63;&#x6d;&#32;&#x61;&#116;&#32;&#106;&#x6f;&#110;&#x6d;&#x61;&#x73;&#116;&#x65;&#114;&#x73;&#32;&#100;&#x6f;&#116;&#32;&#x6f;&#114;&#x67;</noscript
+	> Jon Masters 是从 3.3 版本之后开始参与改软件包的。 其中比较积极的，对于软件包版本升级更新作出较多贡献的开发人员还有 Alan Jenkins <script type="text/javascript"
+	>
+<!--
+h='&#116;&#x75;&#102;&#102;&#x6d;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#46;&#x75;&#x6b;';a='&#64;';n='&#x61;&#108;&#x61;&#110;&#x2d;&#106;&#x65;&#110;&#x6b;&#x69;&#110;&#x73;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+'a'+'>');
+// -->
+</script
+	><noscript
+	>&#x61;&#108;&#x61;&#110;&#x2d;&#106;&#x65;&#110;&#x6b;&#x69;&#110;&#x73;&#32;&#x61;&#116;&#32;&#116;&#x75;&#102;&#102;&#x6d;&#x61;&#x69;&#108;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#32;&#100;&#x6f;&#116;&#32;&#x75;&#x6b;</noscript
+	> Marco d'Itri <script type="text/javascript"
+	>
+<!--
+h='&#108;&#x69;&#110;&#x75;&#120;&#46;&#x69;&#116;';a='&#64;';n='&#x6d;&#100;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+'a'+'>');
+// -->
+</script
+	><noscript
+	>&#x6d;&#100;&#32;&#x61;&#116;&#32;&#108;&#x69;&#110;&#x75;&#120;&#32;&#100;&#x6f;&#116;&#32;&#x69;&#116;</noscript
+	> Andreas Robinson <script type="text/javascript"
+	>
+<!--
+h='&#x67;&#x6d;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x61;&#110;&#100;&#114;&#x33;&#52;&#x35;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+'a'+'>');
+// -->
+</script
+	><noscript
+	>&#x61;&#110;&#100;&#114;&#x33;&#52;&#x35;&#32;&#x61;&#116;&#32;&#x67;&#x6d;&#x61;&#x69;&#108;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;</noscript
+	></p
+      ><p
+      >项目开发人员的邮件列表： linux-modules@vger.kernel.org</p
+      ></div
+    ><div id="&#36719;&#20214;&#21253;&#25152;&#37319;&#29992;&#30340;&#29256;&#26435;&#21327;&#35758;"
+    ><h3
+      >1.3 软件包所采用的版权协议</h3
+      ><p
+      >该软件包所采用的版权协议是GPL协议。</p
+      ></div
+    ><div id="&#36719;&#20214;&#21253;&#30340;&#28436;&#21270;&#21382;&#21490;"
+    ><h3
+      >1.4 软件包的演化历史</h3
+      ><p
+      >该软件包的下载地址是 http://www.kernel.org/pub/linux/utils/kernel/module-init-tools/ 从这个下载地址上能够看到，最早的版本记录是该软件包的3.0版本，时间是2007年9月5日推出的。 最后一个能够下载到的版本是3.15版本，时间是2011年1月2日推出的。</p
+      ><p
+      >之后的下载是通过 Git 命令来获得的。</p
+      ><pre
+      ><code
+	>git://git.kernel.org/pub/scm/utils/kernel/module-init-tools/module-init-tools.git
+</code
+	></pre
+      ><p
+      >从3.1到最新的3.15版本的更新时间，依次是 module-init-tools-3.4.tar.gz 07-Oct-2007 22:09 276K<br
+	 />module-init-tools-3.5.tar.gz 13-Oct-2008 09:13 251K<br
+	 />module-init-tools-3.7.tar.gz 08-Apr-2009 22:08 828K<br
+	 />module-init-tools-3.8.tar.gz 30-Apr-2009 20:37 890K<br
+	 />module-init-tools-3.9.tar.gz 27-May-2009 18:43 229K<br
+	 />module-init-tools-3.10.tar.gz 16-Jul-2009 08:56 1.0M<br
+	 />module-init-tools-3.11-rc1.tar.gz 02-Oct-2009 18:37 130K<br
+	 />module-init-tools-3.11.1.tar.gz 21-Oct-2009 04:10 235K<br
+	 />module-init-tools-3.12.tar.gz 07-Jun-2010 08:06 1.0M<br
+	 />module-init-tools-3.13.tar.gz 31-May-2011 04:56 1.0M<br
+	 />module-init-tools-3.14.tar.gz 02-Jun-2011 06:38 340K<br
+	 />module-init-tools-3.15.tar.gz 02-Jun-2011 17:43 340K</p
+      ><p
+      >从该软件的 ChangeLog 中能够看到的记录是从0.7a版本，以下对各个版本中比较重要的特性做一说明： 0.7a 版本中，增加了对 /etc/modprobe.conf 的支持； 0.8 版本中，增加了 insmod -p -s -f 参数的支持； 0.9.4 版本中，增加了 modprobe -l -t -a 参数支持； 0.9.14 版本中，支持通过 stdin 来插入模块，例如 zcat foo.ko.gz | insmod -</p
+      ><p
+      >比较特别的是，在 ChangeLog 中，版本号从 0.9.14 直接变为 3.0 Version. 3.0 版本中，支持 -a mod1 mod2 同时加载2个模块； 3.2 版本中，modinfo 可以支持 2.6.11 内核； 3.4 版本中，modprobe 可以处理内核命令行 (kernel command line)； 3.6 版本中，开始使用 /sys/module 而不是 /proc/modules； 3.8 版本中，zlib 允许使用动态链接； 3.10 版本中，去掉了一些参数选项的处理； 3.12 版本中，修改了 Makefile 里面的一些问题； 3.14 版本及之后的修改，都是在文档 documentation 方面，代码中的修改已经很少了，说明该软件包也是日趋成熟；</p
+      ><p
+      >在此之后，这个软件包将会被一个新工具所替代，这个新工具将会基于 libkmod。</p
+      ></div
+    ><div id="&#31867;&#20284;&#30340;&#21487;&#26367;&#20195;&#36719;&#20214;&#21253;&#31616;&#20171;overseen"
+    ><h3
+      >1.5 类似的可替代软件包简介overseen</h3
+      ></div
+    ><div id="&#36719;&#20214;&#21253;&#19982;&#21487;&#26367;&#20195;&#36719;&#20214;&#21253;&#23545;&#27604;&#20998;&#26512;"
+    ><h3
+      >1.6 软件包与可替代软件包对比分析</h3
+      ><table
+      ><thead
+	><tr class="header"
+	  ><th align="left"
+	    >对比 应用</th
+	    ><th align="left"
+	    >领域 采用协议</th
+	    ><th align="center"
+	    >特点</th
+	    ><th align="left"
+	    ></th
+	    ></tr
+	  ></thead
+	><tbody
+	><tr class="odd"
+	  ><td align="left"
+	    >glibc</td
+	    ><td align="left"
+	    >桌面领域，GNU/Linux操作系统 LGPL</td
+	    ><td align="center"
+	    >功能全面</td
+	    ><td align="left"
+	    ></td
+	    ></tr
+	  ><tr class="even"
+	  ><td align="left"
+	    >uClibc</td
+	    ><td align="left"
+	    >嵌入式领域，uCLinux操作系统 LGPL</td
+	    ><td align="center"
+	    >主要用在uCLin</td
+	    ><td align="left"
+	    >ux系统中</td
+	    ></tr
+	  ><tr class="odd"
+	  ><td align="left"
+	    >Newlib</td
+	    ><td align="left"
+	    >桌面领域，Cygwin系统 LGPL</td
+	    ><td align="center"
+	    >具有独特的设</td
+	    ><td align="left"
+	    >计，可移植性强</td
+	    ></tr
+	  ><tr class="even"
+	  ><td align="left"
+	    >BSD libc</td
+	    ><td align="left"
+	    >桌面领域，FreeBSD操作系统 BSD</td
+	    ><td align="center"
+	    >主要用在BSD系</td
+	    ><td align="left"
+	    >统中</td
+	    ></tr
+	  ><tr class="odd"
+	  ><td align="left"
+	    >Bionic libc</td
+	    ><td align="left"
+	    >手机嵌入式领域，Android操作系统 BSD</td
+	    ><td align="center"
+	    >主要用在Android</td
+	    ><td align="left"
+	    >系统中</td
+	    ></tr
+	  ><tr class="even"
+	  ><td align="left"
+	    >dietlibc</td
+	    ><td align="left"
+	    >各种对体积尺寸要求严格的领域 GPL2 设计非</td
+	    ><td align="center"
+	    >常精巧，适合学习</td
+	    ><td align="left"
+	    ></td
+	    ></tr
+	  ><tr class="odd"
+	  ><td align="left"
+	    >EGLIBC</td
+	    ><td align="left"
+	    >桌面领域，Ubuntu操作系统 LGPL</td
+	    ><td align="center"
+	    >主要用在Ubun</td
+	    ><td align="left"
+	    >tu系统中</td
+	    ></tr
+	  ></tbody
+	></table
+      ></div
+    ></div
+  ><div id="&#36719;&#20214;&#21253;&#19982;&#21457;&#34892;&#29256;&#30340;&#20851;&#31995;"
+  ><h2
+    >2. 软件包与发行版的关系</h2
+    ><p
+    >本小节需要介绍和阐述软件包在不同发行版中的名称、功能、运行环境的异同，除了正文描述以外，最好填下表以便更清晰，建议不超过1页。</p
+    ><table
+    ><col width="18%"
+       /><col width="23%"
+       /><col width="14%"
+       /><col width="41%"
+       /><thead
+      ><tr class="header"
+	><th align="left"
+	  >发行版名称及版本号 软件包在该发行版中</th
+	  ><th align="left"
+	  >的名称 该软件包的版本 该软件包的安装</th
+	  ><th align="left"
+	  ></th
+	  ><th align="left"
+	  ></th
+	  ></tr
+	></thead
+      ><tbody
+      ><tr class="odd"
+	><td align="left"
+	  >Ubuntu 10.04</td
+	  ><td align="left"
+	  >EGLIBC</td
+	  ><td align="left"
+	  >2.11.1</td
+	  ><td align="left"
+	  >sudo apt-get install libc6-dev <br
+	     />sudo apt-get install glibc-doc</td
+	  ></tr
+	><tr class="even"
+	><td align="left"
+	  >Redhat9</td
+	  ><td align="left"
+	  >glibc</td
+	  ><td align="left"
+	  >2.3.2</td
+	  ><td align="left"
+	  >rpm -Uvh glibc-kernheaders-2.4-8.34.i386.rpm <br
+	     />rpm -Uvh glibc-headers-2.3.2-95.3.i386.rpm <br
+	     />rpm -Uvh glibc-derel-2.3.2-95.3.i386.rpm</td
+	  ></tr
+	><tr class="odd"
+	><td align="left"
+	  >Fedora</td
+	  ><td align="left"
+	  >glibc</td
+	  ><td align="left"
+	  >2.15-23.fc17</td
+	  ><td align="left"
+	  >yum install glibc-devel.i686 glibc.i686</td
+	  ></tr
+	><tr class="even"
+	><td align="left"
+	  >OpenSUSE</td
+	  ><td align="left"
+	  >glibc</td
+	  ><td align="left"
+	  >2.3.3</td
+	  ><td align="left"
+	  >rpm -ivh glibc-devel-2.3.3-98.28.i586.rpm</td
+	  ></tr
+	></tbody
+      ></table
+    ></div
+  ><div id="&#36719;&#20214;&#21253;&#30340;&#21151;&#33021;&#35774;&#35745;&#26550;&#26500;&#21644;&#25509;&#21475;&#20351;&#29992;&#35828;&#26126;"
+  ><h2
+    >3. 软件包的功能、设计架构和接口使用说明</h2
+    ><div id="&#36719;&#20214;&#21253;&#30340;&#21151;&#33021;&#35828;&#26126;"
+    ><h3
+      >3.1 软件包的功能说明</h3
+      ><p
+      >glibc 是Linux系统中最底层的库函数接口，其他的运行库都会依赖于这个库。 它除了封装了Linux系统调用，同时也提供了一些其他必要功能，主要包括：</p
+      ><ul
+      ><li
+	>字符串处理 string</li
+	><li
+	>信号处理 signal</li
+	><li
+	>本地化 locale</li
+	><li
+	>数学库 math</li
+	><li
+	>线程库 linuxthreads</li
+	><li
+	>动态内存管理 malloc</li
+	><li
+	>动态加载器 elf</li
+	><li
+	>C 标准库 libc</li
+	></ul
+      ></div
+    ><div id="&#36719;&#20214;&#21253;&#30340;&#35774;&#35745;&#26550;&#26500;"
+    ><h3
+      >3.2 软件包的设计架构</h3
+      ><pre
+      ><code
+	>此小节建议通过框图和文字说明软件包的内部设计结构，最多1页即可。
+</code
+	></pre
+      ><p
+      >该软件包的程序设计架构非常清晰，围绕向上提供的6个命令，共包含6个主要的模块：</p
+      ><ul
+      ><li
+	>insmod.[c]<ul
+	  ><li
+	    >依赖于 util 模块</li
+	    ></ul
+	  ></li
+	><li
+	>rmmod.[c]<ul
+	  ><li
+	    >依赖于 util, logging 模块</li
+	    ></ul
+	  ></li
+	><li
+	>lsmod.[c]<ul
+	  ><li
+	    >依赖于 /proc/modules 文件</li
+	    ></ul
+	  ></li
+	><li
+	>modinfo.[c]<ul
+	  ><li
+	    >依赖于 util, logging, elfops, zlibsupport 模块</li
+	    ></ul
+	  ></li
+	><li
+	>depmod.[ch]<ul
+	  ><li
+	    >依赖于 util, zlibsupport, logging, index, elfops, tables, config_filter 模块</li
+	    ></ul
+	  ></li
+	><li
+	>modprobe.[c]<ul
+	  ><li
+	    >依赖于 util, zlibsupport, logging, index, elfops, list, config_filter 模块</li
+	    ></ul
+	  ></li
+	><li
+	>elfops.[ch]<ul
+	  ><li
+	    >依赖于 depmod, util, zlibsupport, logging, tables 模块</li
+	    ></ul
+	  ></li
+	><li
+	>tables.[ch]<ul
+	  ><li
+	    >依赖于 struct module (depmod.h), util 模块</li
+	    ></ul
+	  ></li
+	><li
+	>index.[ch]<ul
+	  ><li
+	    >依赖于 util, logging 模块</li
+	    ></ul
+	  ></li
+	><li
+	>config_filter.[ch]<ul
+	  ><li
+	    >依赖于 util 模块</li
+	    ></ul
+	  ></li
+	><li
+	>zlibsupport.[ch]<ul
+	  ><li
+	    >依赖于 logging 模块</li
+	    ></ul
+	  ></li
+	><li
+	>util.[ch]<ul
+	  ><li
+	    >依赖于 logging 模块</li
+	    ></ul
+	  ></li
+	><li
+	>logging.[ch]<ul
+	  ><li
+	    >依赖关系 无</li
+	    ></ul
+	  ></li
+	></ul
+      ></div
+    ><div id="&#36719;&#20214;&#21253;&#30340;&#25509;&#21475;&#35828;&#26126;"
+    ><h3
+      >3.3 软件包的接口说明</h3
+      ><pre
+      ><code
+	>建议这部分最多写3页，如果接口很多，挑最重要的接口写2-3页即可，否则工作量将会非常大，不能在本任务的经费支持范围之内。
+</code
+	></pre
+      ><p
+      >从底层模块的接口分析：</p
+      ><ul
+      ><li
+	>logging 模块接口<ul
+	  ><li
+	    >提供 NOFAIL 宏</li
+	    ><li
+	    >提供打印不同级别信息的接口 info()/warn()/error()/fatal()</li
+	    ></ul
+	  ></li
+	></ul
+      ><p
+      >关键代码</p
+      ><pre
+      ><code
+	>#define NOFAIL(ptr)  do_nofail((ptr), __FILE__, __LINE__, #ptr)
+
+#define nofail_asprintf(ptr, ...)               \
+    do { if (asprintf((ptr), __VA_ARGS__) &lt; 0)      \
+        do_nofail(NULL, __FILE__, __LINE__, #ptr);  \
+    } while(0)
+
+static inline void *do_nofail(void *ptr, const char *file, int line, const char *expr)
+{
+    if (!ptr) {
+        fatal(&quot;Memory allocation failure %s line %d: %s.\n&quot;,
+              file, line, expr);
+    }
+    return ptr;
+}
+</code
+	></pre
+      ><ul
+      ><li
+	>utils 模块接口<ul
+	  ><li
+	    >提供常用的一些函数接口和宏定义，例如 my_basename(), streq(), strstarts()</li
+	    ></ul
+	  ></li
+	></ul
+      ><p
+      >关键代码</p
+      ><pre
+      ><code
+	>char *my_basename(const char *path);    
+void filename2modname(char *modname, const char *filename);
+
+#define streq(a,b) (strcmp((a),(b)) == 0)
+#define strstarts(a,start) (strncmp((a),(start), strlen(start)) == 0)
+</code
+	></pre
+      ><ul
+      ><li
+	>zlibsupport 模块接口<ul
+	  ><li
+	    >提供 grab 文件接口，将文件内容（可能是压缩后的）映射到内存缓冲区 buffer</li
+	    ><li
+	    >需要用到 zlib 库的支持</li
+	    ></ul
+	  ></li
+	></ul
+      ><p
+      >关键代码</p
+      ><pre
+      ><code
+	>/* Grab file.  Decompresses if that is supported.  Returns NULL on error. */
+extern void *grab_file(const char *filename, unsigned long *size);
+extern void *grab_fd(int fd, unsigned long *size);
+
+/* Free it up. */
+extern void release_file(void *data, unsigned long size);
+</code
+	></pre
+      ><ul
+      ><li
+	>config_filter 模块接口</li
+	></ul
+      ><p
+      >关键代码</p
+      ><pre
+      ><code
+	>/* returns 0 if the name matches a well-known backup pattern */
+int config_filter(const char *name);
+</code
+	></pre
+      ><ul
+      ><li
+	><p
+	  >tables 模块接口</p
+	  ></li
+	><li
+	>elfops 模块接口<ul
+	  ><li
+	    >通过对 ELF 特定格式文件的 grab 接口</li
+	    ><li
+	    >提供对于32位和64位机器上 ELF 文件的兼容处理</li
+	    ></ul
+	  ></li
+	></ul
+      ><p
+      >关键代码</p
+      ><pre
+      ><code
+	>struct elf_file *grab_elf_file(const char *pathname);
+void release_elf_file(struct elf_file *file);
+</code
+	></pre
+      ><ul
+      ><li
+	><p
+	  >index 模块接口</p
+	  ></li
+	><li
+	><p
+	  >insmod 模块 init_module</p
+	  ></li
+	><li
+	><p
+	  >rmmod 模块 delete_module</p
+	  ></li
+	><li
+	><h2
+	  >软件包漏洞分析</h2
+	  ></li
+	></ul
+      ><p
+      >这部分任务书的要求是“针对子任务“Linux、Android操作系统安全漏洞检测”中发现的通用基础软件包安全漏洞的确认分析，包括漏洞产生的原因、漏洞可重现条件及相应的测试用例, 并可进行复现和验证；”，但是此部分待定，暂时不要去写，将根据后续情况经过大家的讨论之后再写。因为漏洞的检测有赖另外一个项目（“Linux、Android操作系统安全漏洞检测”）给出，如果漏洞非常多，我们可能需要分出重要性，分类进行处理。</p
+      ></div
+    ></div
+  ><div id="&#36719;&#20214;&#21253;&#30340;&#20381;&#36182;&#20851;&#31995;"
+  ><h2
+    >5. 软件包的依赖关系</h2
+    ><p
+    >这部分请用文字和图说明该软件包的运行还需依赖哪些其他的软件包，其依赖关系不仅要通过阅读文档、代码来获得，更要通过实际的运行验证来获得依赖关系的证据，这一点请慎重处理。</p
+    ><p
+    >安装依赖于 - Bash, Binutils, Bison, Coreutils, Diffutils, Flex, GCC, Glibc, Grep, M4, Make, Sed</p
+    ></div
+  ><div id="&#36719;&#20214;&#21253;&#23433;&#20840;&#24615;&#21450;&#29305;&#21035;&#38656;&#35201;&#35828;&#26126;&#30340;&#38382;&#39064;"
+  ><h2
+    >6. 软件包安全性及特别需要说明的问题</h2
+    ><p
+    >本部分请撰写不能包括在上述章节中的其他重要分析成果，特别是和系统安全有关的内容，如果没有请填写“无”。</p
+    ><ul
+    ><li
+      ><p
+	>无</p
+	></li
+      ><li
+      ><h2
+	>软件包分析成果验证方法</h2
+	></li
+      ></ul
+    ><p
+    >根据任务书，“分析成果进行验证，包括但不限于制作安装包安装测试验证依赖关系、软件包接口测试脚本、可替代软件包兼容性测试验证等。”，具体如何验证后续还有待通过研讨会大家现成讨论确定，但需要在此小节给出进行验证的具体方法和流程的描述，此部分后续在写，暂时空着即可。</p
+    ><ul
+    ><li
+      ><p
+	>待定</p
+	></li
+      ><li
+      ><h2
+	>参考资料</h2
+	></li
+      ></ul
+    ><p
+    >GNU libc 项目主页： <a href="http://www.gnu.org/software/libc/"
+      ><code
+	>http://www.gnu.org/software/libc/</code
+	></a
+      ></p
+    ><p
+    >GNU libc 参考手册： <a href="http://www.gnu.org/software/libc/manual/"
+      ><code
+	>http://www.gnu.org/software/libc/manual/</code
+	></a
+      > <a href="http://www.gnu.org/software/libc/manual/pdf/libc.pdf"
+      ><code
+	>http://www.gnu.org/software/libc/manual/pdf/libc.pdf</code
+	></a
+      ></p
+    ></div
+  ></div
+>
