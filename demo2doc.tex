@@ -1,0 +1,90 @@
+\section{kmod-Linux内核模块工具}
+
+\subsection{1. 项目背景分析}
+
+kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，这些操作包括
+插入（insert），删除（remove），列出（list），检查属性（check
+properties）和解决依赖关系（dependencies）。
+
+这些工具在底层都需要用到 libkmod 这个库，相关的源码也会跟着 kmod
+项目一同发布。这个项目的目标是能够实现与在此之前 module-init-tools
+项目所提供的工具兼容。
+
+\subsubsection{项目建立时间}
+
+从 git.kernel.org 上的 commit log 分析，该项目的建立时间是
+2011-11-21。最初的项目是通过继承了 libabc
+的框架开始逐步演变而来。2011-12-15 发布了 kmod 1 版本。
+
+参考 \textbf{项目主页}
+\url{http://git.kernel.org/cgit/utils/kernel/kmod/kmod.git}
+
+\subsubsection{项目创建者和维护者}
+
+创建者是 Lucas De Marchi。这个人就职于巴西 Brazil Campinas
+的一家公司ProFUSION Embedded
+Systems（该公司的主页http://profusion.mobi/），他的 github 个人项目主页在
+https://github.com/lucasdemarchi，从帐号创建时间看是
+2008年10月30号，应该是属于比较早期的 github 用户。
+
+\subsubsection{项目更新记录}
+
+项目最近一次提交 commit log 表明，该项目近期处于一个比较活跃的状态。从
+2013-4-9 发布了最新的 kmod 13
+版本之后，该项目几乎每隔1，2天有一次或多次提交。最近的一次提交是
+2013-4-17，主要的贡献者仍然是 Lucas De Marchi。
+
+参考 \textbf{提交记录}
+\url{http://git.kernel.org/cgit/utils/kernel/kmod/kmod.git/log/}
+
+\subsubsection{项目版本情况}
+
+目前 kmod 已经发布到了第13个版本，从项目 NEWS 中可以看到，项目从版本 1
+就开始支持原来的 insmod/rmmod/lsmod/modprobe
+这几个常用命令，发展至今libkmod
+库已经提供了100多个函数接口用于方便用户管理内核模块。
+
+\subsubsection{代码下载}
+
+\url{https://www.kernel.org/pub/linux/utils/kernel/kmod}
+第一个可以下载的软件包 kmod-1.tar.gz 是2012-2-24 上传的，最新的软件包
+kmod-13.tar.gz 是 2013-4-9 上传的。
+
+\subsection{2. 项目技术分析}
+
+Compilation and installation
+
+In order to compiler the source code you need following software
+packages: - GCC compiler - GNU C library
+
+Optional dependencies: - ZLIB library - LZMA library
+
+Typical configuration: ./configure CFLAGS=``-g -O2'' --prefix=/usr \\
+--sysconfdir=/etc --libdir=/usr/lib
+
+Configure automatically searches for all required components and
+packages.
+
+To compile and install run: make \&\& make install
+
+Hacking
+
+Run `bootstrap' script before configure. If you want to accept the
+recommended flags, you just need to run `bootstrap-configure'.
+
+Make sure to read the CODING-STYLE file and the other READMEs:
+libkmod/README and testsuite/README.
+
+Information
+
+Signed packages: http://www.kernel.org/pub/linux/utils/kernel/kmod/
+
+Mailing list: linux-modules@vger.kernel.org (no subscription needed)
+
+Git: git://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git
+http://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git
+https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git
+
+Gitweb: http://git.kernel.org/?p=utils/kernel/kmod/kmod.git
+
+Irc: \#kmod on irc.freenode.org
