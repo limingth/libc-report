@@ -427,6 +427,7 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	- uname.c
 * m4
 	- attributes.m4
+
 * man
 	- depmod.d.xml
 	- depmod.xml

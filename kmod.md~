@@ -377,7 +377,6 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	- log.c
 	- log.h
 	- static-nodes.c
-
 * libkmod
 	- COPYING
 	- docs
@@ -403,7 +402,6 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	- macro.h
 	- missing.h
 	- README
-
 * testsuite
 	- COPYING
 	- delete_module.c
@@ -427,10 +425,8 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	- testsuite.h
 	- test-testsuite.c
 	- uname.c
-
 * m4
 	- attributes.m4
-
 * man
 	- depmod.d.xml
 	- depmod.xml
