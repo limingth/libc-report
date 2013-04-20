@@ -716,7 +716,33 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	- kmod_module_insert_module()
 	- kmod_module_unref()
 
-### 接口设计
+### 数据结构设计
+* struct kmod_ctx
+	- 该结构体出现在 libkmod/libkmod.c 文件中
+	- 用于读取配置和系统环境参数，用户参数等
+
+代码片段
+	/**
+	 * kmod_ctx:
+	 *
+	 * Opaque object representing the library context.
+	 */
+	struct kmod_ctx {
+		int refcount;
+		int log_priority;
+		void (*log_fn)(void *data,
+		                int priority, const char *file, int line,
+		                const char *fn, const char *format, va_list args);
+		void *log_data;
+		const void *userdata;
+		char *dirname;
+		struct kmod_config *config;
+		struct hash *modules_by_name;
+		struct index_mm *indexes[_KMOD_INDEX_MODULES_SIZE];
+		unsigned long long indexes_stamp[_KMOD_INDEX_MODULES_SIZE];
+	};
+
+
 
 
 ### 重要接口实现
