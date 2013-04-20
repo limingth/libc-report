@@ -427,7 +427,6 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	- uname.c
 * m4
 	- attributes.m4
-
 * man
 	- depmod.d.xml
 	- depmod.xml
@@ -709,6 +708,13 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	#endif
 	#endif
 	$ 
+
+* 头文件是 libkmod 项目所提供的用于包含的函数调用接口，上层编程者一般都需要 include 这个文件。
+* 以 insmod 命令实现为例，以下函数接口将会用于这个命令实现过程中，典型的调用用法如下：
+	- kmod_new()
+	- kmod_module_new_from_path()
+	- kmod_module_insert_module()
+	- kmod_module_unref()
 
 ### 接口设计
 
