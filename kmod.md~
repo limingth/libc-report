@@ -721,7 +721,7 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	- 该结构体出现在 libkmod/libkmod.c 文件中
 	- 用于读取配置和系统环境参数，用户参数等
 
-代码片段
+结构体定义
 
 	/**
 	 * kmod_ctx:
@@ -742,6 +742,80 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 		struct index_mm *indexes[_KMOD_INDEX_MODULES_SIZE];
 		unsigned long long indexes_stamp[_KMOD_INDEX_MODULES_SIZE];
 	};
+
+* struct kmod_list
+	- 该结构体出现在 libkmod/libkmod-private.h 文件中
+	- 用于访问 kmod 产生的模块节点链表
+
+结构体定义
+
+	struct list_node {
+		struct list_node *next, *prev;
+	};
+
+	struct kmod_list {
+		struct list_node node;
+		void *data;
+	};
+
+* struct kmod_config_iter
+	- 该结构体出现在 libkmod/libkmod-config.c 文件中
+
+* struct kmod_module
+	- 该结构体出现在 libkmod/libkmod-module.c 文件中
+
+结构体定义
+
+	/**
+	 * SECTION:libkmod-module
+	 * @short_description: operate on kernel modules
+	 */
+
+	/**
+	 * kmod_module:
+	 *
+	 * Opaque object representing a module.
+	 */
+	struct kmod_module {
+		struct kmod_ctx *ctx;
+		char *hashkey;
+		char *name;
+		char *path;
+		struct kmod_list *dep;
+		char *options;
+		const char *install_commands;	/* owned by kmod_config */
+		const char *remove_commands;	/* owned by kmod_config */
+		char *alias; /* only set if this module was created from an alias */
+		struct kmod_file *file;
+		int n_dep;
+		int refcount;
+		struct {
+			bool dep : 1;
+			bool options : 1;
+			bool install_commands : 1;
+			bool remove_commands : 1;
+		} init;
+
+		/*
+		 * private field used by kmod_module_get_probe_list() to detect
+		 * dependency loops
+		 */
+		bool visited : 1;
+
+		/*
+		 * set by kmod_module_get_probe_list: indicates for probe_insert()
+		 * whether the module's command and softdep should be ignored
+		 */
+		bool ignorecmd : 1;
+
+		/*
+		 * if module was created by searching the modules.builtin file, this
+		 * is set. There's nothing much useful one can do with such a
+		 * "module", except knowing it's builtin.
+		 */
+		bool builtin : 1;
+	};
+
 
 
 
