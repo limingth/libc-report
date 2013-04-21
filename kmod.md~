@@ -53,12 +53,12 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 
 ### 开发环境准备
 * 首先需要安装如下的软件工具
-	- GCC compiler
-	- GNU C library
-	- autoconf
-	- shtool
-	- libtool
-	- xsltproc
+	- GCC compiler 编译工具
+	- GNU C library 标准C库
+	- autoconf 自动化配置工具，可以生成项目所需的 makefile
+	- shtool 一个兼容之前类似 mkdir.sh/install.sh 的shell脚本工具
+	- libtool 制作可生成依赖关系的共享库，生成文件后缀名为 .la, lo
+	- xsltproc 快速XSLT引擎，可以通过XSL层叠样式表把XML转换为其他格式，例如html/pdf
 
 * 可选的依赖关系:
 	- ZLIB library
@@ -76,15 +76,21 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	$ make && make install
 
 ### 错误及解决
-	$ autoconf 
+代码编译过程会出现不少问题，但都可以通过安装和配置逐一解决。现对编译过程中的问题做一总结：
+
+**1）autoconf 缺少环境变量文件**
+
+ 	$ autoconf 
 	configure.ac:10: error: possibly undefined macro: AM_INIT_AUTOMAKE
 	      If this token and others are legitimate, please use m4_pattern_allow.
 	      See the Autoconf documentation.
 	configure.ac:28: error: possibly undefined macro: AM_PROG_CC_C_O
 	configure.ac:89: error: possibly undefined macro: AM_CONDITIONAL
 	$ aclocal
-	 (获取当前系统的环境变量，生成一个 aclocal.m4 文件）
 
+通过 aclocal 命令生成，获取当前系统的环境变量，生成一个 aclocal.m4 文件。
+
+**2）configure 脚本执行时缺少 libtool 工具**
 	$ ./configure CFLAGS="-g -O2" --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
 	configure: error: cannot find install-sh, install.sh, or shtool in build-aux "."/build-aux
 	$ autoreconf -f -i -Wall,no-obsolete
@@ -92,12 +98,19 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	Use of uninitialized value in pattern match (m//) at /usr/bin/autoreconf line 196.
 	$ sudo apt-get install libtool
 
+通过 sudo apt-get 安装解决。
+
+**3）configuire 脚本执行缺少 xsltproc 命令**
+
 	$ ./configure CFLAGS="-g -O2" --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
 	configure: error: xsltproc command not found, try ./configure --disable-manpages
 	$ sudo apt-get install xsltproc 
-	（成功之后，会在当前目录下生成 Makefile 文件）
+
+通过 sudo apt-get 安装解决，成功之后，会在当前目录下生成 Makefile 文件。
 
 ### 编译过程
+编译过程总体比较顺利，执行 make 和 make install 命令即可完成。
+
 	$ make
 	make --no-print-directory all-recursive
 	Making all in .
@@ -146,6 +159,8 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	  GEN    modprobe.8
 	  GEN    modinfo.8
 
+由以上编译过程可知，项目主要架构分为2层，上层为 tools 目录下提供的各种工具（兼容之前的命令集，例如 insmod/rmmod），下层为 libkmod 目录下生成的 libkmod.la，为上层工具提供所需要的库函数。
+
 ### 生成文件
 	$ ls tools/ -l | grep x
 	lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 depmod -> kmod-nolib
@@ -156,6 +171,9 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 modinfo -> kmod-nolib
 	lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 modprobe -> kmod-nolib
 	lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 rmmod -> kmod-nolib
+
+可以看出以上所有工具，均是 kmod-nolib 的软链接。实现了一个 kmod-nolib 程序，也就实现了之前的各种工具。
+这种实现思路，类似于嵌入式开发中的 busybox 项目，也是实现了一堆工具，但只有一个真正的可执行文件。
 
 	$ ls libkmod/ -l | grep lo 
 	-rw-rw-r-- 1 akaedu akaedu   308 Apr 17 04:43 libkmod-array.lo
@@ -170,14 +188,20 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	-rw-rw-r-- 1 akaedu akaedu   316 Apr 17 04:43 libkmod-signature.lo
 	-rw-rw-r-- 1 akaedu akaedu   306 Apr 17 04:43 libkmod-util.lo
 
+上面所列的 lo 文件中，libkmod-module.lo 中包含了在整个库中，最靠近上层调用所需要用的接口函数。其他的 lo 文件基本上都是为 libkmod-module.lo 所服务的，比较重要的例如 libkmod-elf, libkmod-file, libkmod-list 等。
+
 	$ ls libkmod/ -l | grep la
 	-rw-rw-r-- 1 akaedu akaedu   923 Apr 17 04:43 libkmod.la
 	-rw-rw-r-- 1 akaedu akaedu   893 Apr 17 04:43 libkmod-private.la
 	-rw-rw-r-- 1 akaedu akaedu   884 Apr 17 04:43 libkmod-util.la
-	
+
+最终提供的库文件是以 libkmod.la 的形式存在。	
+
 	$ ls libkmod/ -l | grep pc
 	-rw-rw-r-- 1 akaedu akaedu   210 Apr 17 04:43 libkmod.pc
 	-rw-rw-r-- 1 akaedu akaedu   255 Apr 17 00:53 libkmod.pc.in
+
+此文件暂时没看出有什么特殊的作用，只包含了一些对当前库的说明信息，是一个纯文本文件。
 
 ### 安装过程
 
@@ -196,6 +220,8 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	make[2]: *** [install-libLTLIBRARIES] Error 1
 	make[1]: *** [install-am] Error 2
 	make: *** [install-recursive] Error 1
+
+编译过程中，因为需要用到对 /usr/bin 目录的读写权限，因此需要用 sudo 来执行。
 
 	$ sudo make install
 	Making install in .
@@ -250,6 +276,8 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	 /usr/bin/install -c -m 644 depmod.8 insmod.8 lsmod.8 rmmod.8 modprobe.8 modinfo.8 '/usr/share/man/man8'
 	$ sudo make install
 
+这个 make 和 make install 的过程，帮助我们理清了哪些文件参与最后的编译生成过程。特别是对于最后 make install 的执行分析，也让我们了解了项目最终要实现的目标和生成的重要文件。以下将对这一过程展开详细分析。
+
 ### 安装文件
 	$ ls /usr/lib/libkmod.so
 	libkmod.so        libkmod.so.2      libkmod.so.2.2.3  
@@ -257,14 +285,19 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so -> libkmod.so.2.2.3
 	lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so.2 -> libkmod.so.2.2.3
 	-rwxr-xr-x 1 root root 313349 Apr 17 04:55 /usr/lib/libkmod.so.2.2.3
-	
+
+libkmod.so 是一个软链接，安装在系统的 /usr/lib 目录下，链接的时候只需要指定 -lkmod 就可以。	
+
 	$ ls /usr/lib/libkmod.l* -l
 	-rwxr-xr-x 1 root root 924 Apr 17 04:55 /usr/lib/libkmod.la
+
 	$ ls /usr/lib/libkmod.* -l
 	-rwxr-xr-x 1 root root    924 Apr 17 04:55 /usr/lib/libkmod.la
 	lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so -> libkmod.so.2.2.3
 	lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so.2 -> libkmod.so.2.2.3
 	-rwxr-xr-x 1 root root 313349 Apr 17 04:55 /usr/lib/libkmod.so.2.2.3
+
+真正起作用的 so 文件，也就是 libkmod 共享库的 real name 是 libkmod.so.2.2.3。
 
 	$ ls /usr/bin/kmod  -l
 	-rwxr-xr-x 1 root root 233584 Apr 17 04:55 /usr/bin/kmod
@@ -293,10 +326,13 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	  modprobe     compat modprobe command
 	  depmod       compat depmod command
 
+kmod 是一个工具，可以实现内核模块的 list 和 打印输出已经被加载的内核模块的详细信息。
 
 	$ ls /usr/include/libkmod.h -l
 	-rw-r--r-- 1 root root 9429 Apr 17 04:55 /usr/include/libkmod.h
 	$ 文件内容见下面小节
+
+头文件是最重要的生成文件，会被之后所有调用 libkmod 库的上层应用所包含。一个文件就包含了所有需要用的函数接口声明，使用起来也非常方便。只不过这个文件中包含了较多的函数，互相之间不是平行的，内部是有上下层次关系的。
 
 	$ ls /usr/lib/pkgconfig/libkmod.pc -l
 	-rw-r--r-- 1 root root 210 Apr 17 04:55 /usr/lib/pkgconfig/libkmod.pc
@@ -313,6 +349,8 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	Libs.private:  
 	Cflags: -I${includedir}
 	$ 
+
+这个文件只是一个纯文本文件，里面包含了如上所列出的信息。
 
 	$ ls /usr/share/man/man5/ -l | grep "Apr 17"
 	-rw-r--r-- 1 root root  3969 Apr 17 04:55 depmod.d.5
@@ -333,7 +371,8 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 	-rw-r--r-- 1 root root 10618 Apr 17 04:55 modprobe.8
 	-rw-r--r-- 1 root root  3058 Apr 17 04:55 rmmod.8
 	-rw-r--r-- 1 root root  1016 Apr 17  2012 update-initramfs.8.gz
-	$ 
+	
+以上所有文件，均为 man 手册所准备的，通过 make install 将安装到系统路径 /usr/share/man/man8 下。
 
 ### 功能简介
 * libkmod.so
@@ -761,6 +800,19 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 * struct kmod_config_iter
 	- 该结构体出现在 libkmod/libkmod-config.c 文件中
 
+结构体定义
+
+	struct kmod_config_iter {
+		enum config_type type;
+		bool intermediate;
+		const struct kmod_list *list;
+		const struct kmod_list *curr;
+		void *data;
+		const char *(*get_key)(const struct kmod_list *l); 
+		const char *(*get_value)(const struct kmod_list *l); 
+	};
+
+
 * struct kmod_module
 	- 该结构体出现在 libkmod/libkmod-module.c 文件中
 
@@ -816,12 +868,31 @@ kmod 是为了能够操作 Linux 内核模块而推出的一系列工具集，�
 		bool builtin : 1;
 	};
 
-
-
-
-
 ### 重要接口实现
+* kmod_module_insert_module() in libkmod/libkmod-module.c
+	- kmod_module_get_path()
+	- file = kmod_file_open()
+	- kmod_file_get_direct()
+	- size = kmod_file_get_size(file)
+	- mem = kmod_file_get_contents(file)
+	- kmod_elf_new()
+	- kmod_elf_strip_section()
+	- kmod_elf_get_memory()
+	- init_module(mem, size, args) 
+	- kmod_elf_unref()
+	- kmod_file_unref()
 
+* 对比 module-init-tools 的实现，可以发现代码的层次逻辑复杂不少
+	- realloc()
+	- grab_file()
+		- open()
+		- malloc()
+		- read()
+		- close()
+	- init_module(file, len, options)
+	- free()
 
-### 调用流程图
+* kmod_module_remove_module in libkmod/libkmod-module.c
+	- delete_module()
+
 

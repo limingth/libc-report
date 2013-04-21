@@ -39,8 +39,6 @@
 \setcounter{secnumdepth}{0}
 
 
-\usepackage{framed,color}
-\definecolor{shadecolor}{gray}{0.95}
 \begin{document}
 
 \section{kmod-Linux内核模块工具}

@@ -39,8 +39,6 @@
 \setcounter{secnumdepth}{0}
 
 
-\usepackage{framed,color}
-\definecolor{shadecolor}{gray}{0.95}
 \begin{document}
 
 \section{kmod-Linux内核模块工具}
@@ -140,7 +138,7 @@ kmod-13.tar.gz 是 2013-4-9 上传的。
 \end{itemize}
 \subsubsection{编译和安装}
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ sudo apt-get install autoconf 
 $ sudo apt-get install shtool 
 $ sudo apt-get install libtool
@@ -150,50 +148,45 @@ $ aclocal
 $ autoconf
 $ ./configure CFLAGS="-g -O2" --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
 $ make && make install
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 \subsubsection{错误及解决}
 
 代码编译过程会出现不少问题，但都可以通过安装和配置逐一解决。现对编译过程中的问题做一总结：
 
 \textbf{1）autoconf 缺少环境变量文件}
 
-{\begin{shaded}\begin{verbatim}
-$ autoconf 
-configure.ac:10: error: possibly undefined macro: AM_INIT_AUTOMAKE
-      If this token and others are legitimate, please use m4_pattern_allow.
-      See the Autoconf documentation.
-configure.ac:28: error: possibly undefined macro: AM_PROG_CC_C_O
-configure.ac:89: error: possibly undefined macro: AM_CONDITIONAL
-$ aclocal
-\end{verbatim}\end{shaded}}
+\$ autoconf configure.ac:10: error: possibly undefined macro:
+AM\_INIT\_AUTOMAKE If this token and others are legitimate, please use
+m4\_pattern\_allow. See the Autoconf documentation. configure.ac:28:
+error: possibly undefined macro: AM\_PROG\_CC\_C\_O configure.ac:89:
+error: possibly undefined macro: AM\_CONDITIONAL \$ aclocal
+
 通过 aclocal 命令生成，获取当前系统的环境变量，生成一个 aclocal.m4 文件。
 
-\textbf{2）configure 脚本执行时缺少 libtool 工具}
+\textbf{2）configure 脚本执行时缺少 libtool 工具} \$ ./configure
+CFLAGS=``-g -O2'' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
+configure: error: cannot find install-sh, install.sh, or shtool in
+build-aux ``.''/build-aux \$ autoreconf -f -i -Wall,no-obsolete Can't
+exec ``libtoolize'': No such file or directory at /usr/bin/autoreconf
+line 196. Use of uninitialized value in pattern match (m//) at
+/usr/bin/autoreconf line 196. \$ sudo apt-get install libtool
 
-{\begin{shaded}\begin{verbatim}
-$ ./configure CFLAGS="-g -O2" --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
-configure: error: cannot find install-sh, install.sh, or shtool in build-aux "."/build-aux
-$ autoreconf -f -i -Wall,no-obsolete
-Can't exec "libtoolize": No such file or directory at /usr/bin/autoreconf line 196.
-Use of uninitialized value in pattern match (m//) at /usr/bin/autoreconf line 196.
-$ sudo apt-get install libtool
-\end{verbatim}\end{shaded}}
 通过 sudo apt-get 安装解决。
 
 \textbf{3）configuire 脚本执行缺少 xsltproc 命令}
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ./configure CFLAGS="-g -O2" --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
 configure: error: xsltproc command not found, try ./configure --disable-manpages
 $ sudo apt-get install xsltproc 
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 通过 sudo apt-get 安装解决，成功之后，会在当前目录下生成 Makefile 文件。
 
 \subsubsection{编译过程}
 
 编译过程总体比较顺利，执行 make 和 make install 命令即可完成。
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ make
 make --no-print-directory all-recursive
 Making all in .
@@ -241,14 +234,14 @@ Making all in man
   GEN    rmmod.8
   GEN    modprobe.8
   GEN    modinfo.8
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 由以上编译过程可知，项目主要架构分为2层，上层为 tools
 目录下提供的各种工具（兼容之前的命令集，例如 insmod/rmmod），下层为 libkmod
 目录下生成的 libkmod.la，为上层工具提供所需要的库函数。
 
 \subsubsection{生成文件}
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ls tools/ -l | grep x
 lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 depmod -> kmod-nolib
 lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 insmod -> kmod-nolib
@@ -258,12 +251,12 @@ lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 lsmod -> kmod-nolib
 lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 modinfo -> kmod-nolib
 lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 modprobe -> kmod-nolib
 lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 rmmod -> kmod-nolib
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 可以看出以上所有工具，均是 kmod-nolib 的软链接。实现了一个 kmod-nolib
 程序，也就实现了之前的各种工具。 这种实现思路，类似于嵌入式开发中的
 busybox 项目，也是实现了一堆工具，但只有一个真正的可执行文件。
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ls libkmod/ -l | grep lo 
 -rw-rw-r-- 1 akaedu akaedu   308 Apr 17 04:43 libkmod-array.lo
 -rw-rw-r-- 1 akaedu akaedu   310 Apr 17 04:43 libkmod-config.lo
@@ -276,30 +269,30 @@ $ ls libkmod/ -l | grep lo
 -rw-rw-r-- 1 akaedu akaedu   310 Apr 17 04:43 libkmod-module.lo
 -rw-rw-r-- 1 akaedu akaedu   316 Apr 17 04:43 libkmod-signature.lo
 -rw-rw-r-- 1 akaedu akaedu   306 Apr 17 04:43 libkmod-util.lo
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 上面所列的 lo 文件中，libkmod-module.lo
 中包含了在整个库中，最靠近上层调用所需要用的接口函数。其他的 lo
 文件基本上都是为 libkmod-module.lo 所服务的，比较重要的例如 libkmod-elf,
 libkmod-file, libkmod-list 等。
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ls libkmod/ -l | grep la
 -rw-rw-r-- 1 akaedu akaedu   923 Apr 17 04:43 libkmod.la
 -rw-rw-r-- 1 akaedu akaedu   893 Apr 17 04:43 libkmod-private.la
 -rw-rw-r-- 1 akaedu akaedu   884 Apr 17 04:43 libkmod-util.la
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 最终提供的库文件是以 libkmod.la 的形式存在。
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ls libkmod/ -l | grep pc
 -rw-rw-r-- 1 akaedu akaedu   210 Apr 17 04:43 libkmod.pc
 -rw-rw-r-- 1 akaedu akaedu   255 Apr 17 00:53 libkmod.pc.in
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 此文件暂时没看出有什么特殊的作用，只包含了一些对当前库的说明信息，是一个纯文本文件。
 
 \subsubsection{安装过程}
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ make && make install
 make --no-print-directory all-recursive
 Making all in .
@@ -315,11 +308,11 @@ libtool: install: /usr/bin/install -c libkmod/.libs/libkmod.so.2.2.3 /usr/lib/li
 make[2]: *** [install-libLTLIBRARIES] Error 1
 make[1]: *** [install-am] Error 2
 make: *** [install-recursive] Error 1
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 编译过程中，因为需要用到对 /usr/bin 目录的读写权限，因此需要用 sudo
 来执行。
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ sudo make install
 Making install in .
 test -z "/usr/lib" || /bin/mkdir -p "/usr/lib"
@@ -352,12 +345,12 @@ test -z "/usr/bin" || /bin/mkdir -p "/usr/bin"
 libtool: install: /usr/bin/install -c tools/.libs/kmod /usr/bin/kmod
 make --no-print-directory install-exec-hook
 if test "/usr/lib" != "/usr/lib"; then \
-        /bin/mkdir -p /usr/lib && \
-        so_img_name=$(readlink /usr/lib/libkmod.so) && \
-        so_img_rel_target_prefix=$(echo /usr/lib | sed 's,\(^/\|\)[^/][^/]*,..,g') && \
-        ln -sf $so_img_rel_target_prefix/usr/lib/$so_img_name /usr/lib/libkmod.so && \
-        mv /usr/lib/libkmod.so.* /usr/lib; \
-    fi
+		/bin/mkdir -p /usr/lib && \
+		so_img_name=$(readlink /usr/lib/libkmod.so) && \
+		so_img_rel_target_prefix=$(echo /usr/lib | sed 's,\(^/\|\)[^/][^/]*,..,g') && \
+		ln -sf $so_img_rel_target_prefix/usr/lib/$so_img_name /usr/lib/libkmod.so && \
+		mv /usr/lib/libkmod.so.* /usr/lib; \
+	fi
 test -z "/usr/include" || /bin/mkdir -p "/usr/include"
  /usr/bin/install -c -m 644 libkmod/libkmod.h '/usr/include'
 test -z "/usr/lib/pkgconfig" || /bin/mkdir -p "/usr/lib/pkgconfig"
@@ -372,7 +365,7 @@ test -z "/usr/share/man/man5" || /bin/mkdir -p "/usr/share/man/man5"
 test -z "/usr/share/man/man8" || /bin/mkdir -p "/usr/share/man/man8"
  /usr/bin/install -c -m 644 depmod.8 insmod.8 lsmod.8 rmmod.8 modprobe.8 modinfo.8 '/usr/share/man/man8'
 $ sudo make install
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 这个 make 和 make install
 的过程，帮助我们理清了哪些文件参与最后的编译生成过程。特别是对于最后 make
 install
@@ -380,18 +373,18 @@ install
 
 \subsubsection{安装文件}
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ls /usr/lib/libkmod.so
 libkmod.so        libkmod.so.2      libkmod.so.2.2.3  
 $ ls /usr/lib/libkmod.so* -l
 lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so -> libkmod.so.2.2.3
 lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so.2 -> libkmod.so.2.2.3
 -rwxr-xr-x 1 root root 313349 Apr 17 04:55 /usr/lib/libkmod.so.2.2.3
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 libkmod.so 是一个软链接，安装在系统的 /usr/lib
 目录下，链接的时候只需要指定 -lkmod 就可以。
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ls /usr/lib/libkmod.l* -l
 -rwxr-xr-x 1 root root 924 Apr 17 04:55 /usr/lib/libkmod.la
 
@@ -400,11 +393,11 @@ $ ls /usr/lib/libkmod.* -l
 lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so -> libkmod.so.2.2.3
 lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so.2 -> libkmod.so.2.2.3
 -rwxr-xr-x 1 root root 313349 Apr 17 04:55 /usr/lib/libkmod.so.2.2.3
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 真正起作用的 so 文件，也就是 libkmod 共享库的 real name 是
 libkmod.so.2.2.3。
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ls /usr/bin/kmod  -l
 -rwxr-xr-x 1 root root 233584 Apr 17 04:55 /usr/bin/kmod
 $ file /usr/bin/kmod
@@ -413,11 +406,11 @@ $ kmod
 missing command
 kmod - Manage kernel modules: list, load, unload, etc
 Usage:
-    kmod [options] command [command_options]
+	kmod [options] command [command_options]
 
 Options:
-    -V, --version     show version
-    -h, --help        show this help
+	-V, --version     show version
+	-h, --help        show this help
 
 Commands:
   help         Show help message
@@ -431,19 +424,19 @@ kmod also handles gracefully if called from following symlinks:
   modinfo      compat modinfo command
   modprobe     compat modprobe command
   depmod       compat depmod command
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 kmod 是一个工具，可以实现内核模块的 list 和
 打印输出已经被加载的内核模块的详细信息。
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ls /usr/include/libkmod.h -l
 -rw-r--r-- 1 root root 9429 Apr 17 04:55 /usr/include/libkmod.h
 $ 文件内容见下面小节
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 头文件是最重要的生成文件，会被之后所有调用 libkmod
 库的上层应用所包含。一个文件就包含了所有需要用的函数接口声明，使用起来也非常方便。只不过这个文件中包含了较多的函数，互相之间不是平行的，内部是有上下层次关系的。
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ls /usr/lib/pkgconfig/libkmod.pc -l
 -rw-r--r-- 1 root root 210 Apr 17 04:55 /usr/lib/pkgconfig/libkmod.pc
 $ cat /usr/lib/pkgconfig/libkmod.pc 
@@ -459,10 +452,10 @@ Libs: -L${libdir} -lkmod
 Libs.private:  
 Cflags: -I${includedir}
 $ 
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 这个文件只是一个纯文本文件，里面包含了如上所列出的信息。
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ ls /usr/share/man/man5/ -l | grep "Apr 17"
 -rw-r--r-- 1 root root  3969 Apr 17 04:55 depmod.d.5
 -rw-r--r-- 1 root root  9306 Apr 17  2012 fonts-conf.5.gz
@@ -482,7 +475,7 @@ $ ls /usr/share/man/man8/ -l | grep "Apr 17"
 -rw-r--r-- 1 root root 10618 Apr 17 04:55 modprobe.8
 -rw-r--r-- 1 root root  3058 Apr 17 04:55 rmmod.8
 -rw-r--r-- 1 root root  1016 Apr 17  2012 update-initramfs.8.gz
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 以上所有文件，均为 man 手册所准备的，通过 make install 将安装到系统路径
 /usr/share/man/man8 下。
 
@@ -707,7 +700,7 @@ $ ls /usr/share/man/man8/ -l | grep "Apr 17"
 \end{itemize}
 \subsubsection{头文件分析}
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 $ cat /usr/include/libkmod.h 
 
 /*
@@ -754,11 +747,11 @@ struct kmod_ctx *kmod_new(const char *dirname, const char * const *config_paths)
 struct kmod_ctx *kmod_ref(struct kmod_ctx *ctx);
 struct kmod_ctx *kmod_unref(struct kmod_ctx *ctx);
 void kmod_set_log_fn(struct kmod_ctx *ctx,
-            void (*log_fn)(void *log_data,
-                    int priority, const char *file, int line,
-                    const char *fn, const char *format,
-                    va_list args),
-            const void *data);
+			void (*log_fn)(void *log_data,
+					int priority, const char *file, int line,
+					const char *fn, const char *format,
+					va_list args),
+			const void *data);
 int kmod_get_log_priority(const struct kmod_ctx *ctx);
 void kmod_set_log_priority(struct kmod_ctx *ctx, int priority);
 void *kmod_get_userdata(const struct kmod_ctx *ctx);
@@ -772,19 +765,19 @@ int kmod_load_resources(struct kmod_ctx *ctx);
 void kmod_unload_resources(struct kmod_ctx *ctx);
 
 enum kmod_resources {
-    KMOD_RESOURCES_OK = 0,
-    KMOD_RESOURCES_MUST_RELOAD = 1,
-    KMOD_RESOURCES_MUST_RECREATE = 2,
+	KMOD_RESOURCES_OK = 0,
+	KMOD_RESOURCES_MUST_RELOAD = 1,
+	KMOD_RESOURCES_MUST_RECREATE = 2,
 };
 int kmod_validate_resources(struct kmod_ctx *ctx);
 
 enum kmod_index {
-    KMOD_INDEX_MODULES_DEP = 0,
-    KMOD_INDEX_MODULES_ALIAS,
-    KMOD_INDEX_MODULES_SYMBOL,
-    KMOD_INDEX_MODULES_BUILTIN,
-    /* Padding to make sure enum is not mapped to char */
-    _KMOD_INDEX_PAD = (1 << 31),
+	KMOD_INDEX_MODULES_DEP = 0,
+	KMOD_INDEX_MODULES_ALIAS,
+	KMOD_INDEX_MODULES_SYMBOL,
+	KMOD_INDEX_MODULES_BUILTIN,
+	/* Padding to make sure enum is not mapped to char */
+	_KMOD_INDEX_PAD = (1 << 31),
 };
 int kmod_dump_index(struct kmod_ctx *ctx, enum kmod_index type, int fd);
 
@@ -795,20 +788,20 @@ int kmod_dump_index(struct kmod_ctx *ctx, enum kmod_index type, int fd);
  */
 struct kmod_list;
 struct kmod_list *kmod_list_next(const struct kmod_list *list,
-                        const struct kmod_list *curr);
+						const struct kmod_list *curr);
 struct kmod_list *kmod_list_prev(const struct kmod_list *list,
-                        const struct kmod_list *curr);
+						const struct kmod_list *curr);
 struct kmod_list *kmod_list_last(const struct kmod_list *list);
 
 #define kmod_list_foreach(list_entry, first_entry) \
-    for (list_entry = first_entry; \
-        list_entry != NULL; \
-        list_entry = kmod_list_next(first_entry, list_entry))
+	for (list_entry = first_entry; \
+		list_entry != NULL; \
+		list_entry = kmod_list_next(first_entry, list_entry))
 
 #define kmod_list_foreach_reverse(list_entry, first_entry) \
-    for (list_entry = kmod_list_last(first_entry); \
-        list_entry != NULL; \
-        list_entry = kmod_list_prev(first_entry, list_entry))
+	for (list_entry = kmod_list_last(first_entry); \
+		list_entry != NULL; \
+		list_entry = kmod_list_prev(first_entry, list_entry))
 
 /*
  * kmod_config_iter
@@ -835,13 +828,13 @@ void kmod_config_iter_free_iter(struct kmod_config_iter *iter);
  */
 struct kmod_module;
 int kmod_module_new_from_name(struct kmod_ctx *ctx, const char *name,
-                        struct kmod_module **mod);
+						struct kmod_module **mod);
 int kmod_module_new_from_path(struct kmod_ctx *ctx, const char *path,
-                        struct kmod_module **mod);
+						struct kmod_module **mod);
 int kmod_module_new_from_lookup(struct kmod_ctx *ctx, const char *given_alias,
-                        struct kmod_list **list);
+						struct kmod_list **list);
 int kmod_module_new_from_loaded(struct kmod_ctx *ctx,
-                        struct kmod_list **list);
+						struct kmod_list **list);
 
 struct kmod_module *kmod_module_ref(struct kmod_module *mod);
 struct kmod_module *kmod_module_unref(struct kmod_module *mod);
@@ -851,47 +844,47 @@ struct kmod_module *kmod_module_get_module(const struct kmod_list *entry);
 
 /* Removal flags */
 enum kmod_remove {
-    KMOD_REMOVE_FORCE = O_TRUNC,
-    KMOD_REMOVE_NOWAIT = O_NONBLOCK,
+	KMOD_REMOVE_FORCE = O_TRUNC,
+	KMOD_REMOVE_NOWAIT = O_NONBLOCK,
 };
 
 /* Insertion flags */
 enum kmod_insert {
-    KMOD_INSERT_FORCE_VERMAGIC = 0x1,
-    KMOD_INSERT_FORCE_MODVERSION = 0x2,
+	KMOD_INSERT_FORCE_VERMAGIC = 0x1,
+	KMOD_INSERT_FORCE_MODVERSION = 0x2,
 };
 
 /* Flags to kmod_module_probe_insert_module() */
 enum kmod_probe {
-    KMOD_PROBE_FORCE_VERMAGIC =     0x00001,
-    KMOD_PROBE_FORCE_MODVERSION =       0x00002,
-    KMOD_PROBE_IGNORE_COMMAND =     0x00004,
-    KMOD_PROBE_IGNORE_LOADED =      0x00008,
-    KMOD_PROBE_DRY_RUN =            0x00010,
-    KMOD_PROBE_FAIL_ON_LOADED =     0x00020,
+	KMOD_PROBE_FORCE_VERMAGIC =		0x00001,
+	KMOD_PROBE_FORCE_MODVERSION =		0x00002,
+	KMOD_PROBE_IGNORE_COMMAND =		0x00004,
+	KMOD_PROBE_IGNORE_LOADED =		0x00008,
+	KMOD_PROBE_DRY_RUN =			0x00010,
+	KMOD_PROBE_FAIL_ON_LOADED =		0x00020,
 
-    /* codes below can be used in return value, too */
-    KMOD_PROBE_APPLY_BLACKLIST_ALL =    0x10000,
-    KMOD_PROBE_APPLY_BLACKLIST =        0x20000,
-    KMOD_PROBE_APPLY_BLACKLIST_ALIAS_ONLY = 0x40000,
+	/* codes below can be used in return value, too */
+	KMOD_PROBE_APPLY_BLACKLIST_ALL =	0x10000,
+	KMOD_PROBE_APPLY_BLACKLIST =		0x20000,
+	KMOD_PROBE_APPLY_BLACKLIST_ALIAS_ONLY =	0x40000,
 };
 
 /* Flags to kmod_module_apply_filter() */
 enum kmod_filter {
-    KMOD_FILTER_BLACKLIST = 0x00001,
-    KMOD_FILTER_BUILTIN = 0x00002,
+	KMOD_FILTER_BLACKLIST = 0x00001,
+	KMOD_FILTER_BUILTIN = 0x00002,
 };
 
 int kmod_module_remove_module(struct kmod_module *mod, unsigned int flags);
 int kmod_module_insert_module(struct kmod_module *mod, unsigned int flags,
-                            const char *options);
+							const char *options);
 int kmod_module_probe_insert_module(struct kmod_module *mod,
-            unsigned int flags, const char *extra_options,
-            int (*run_install)(struct kmod_module *m,
-                        const char *cmdline, void *data),
-            const void *data,
-            void (*print_action)(struct kmod_module *m, bool install,
-                        const char *options));
+			unsigned int flags, const char *extra_options,
+			int (*run_install)(struct kmod_module *m,
+						const char *cmdline, void *data),
+			const void *data,
+			void (*print_action)(struct kmod_module *m, bool install,
+						const char *options));
 
 
 const char *kmod_module_get_name(const struct kmod_module *mod);
@@ -901,14 +894,14 @@ const char *kmod_module_get_install_commands(const struct kmod_module *mod);
 const char *kmod_module_get_remove_commands(const struct kmod_module *mod);
 struct kmod_list *kmod_module_get_dependencies(const struct kmod_module *mod);
 int kmod_module_get_softdeps(const struct kmod_module *mod,
-                struct kmod_list **pre, struct kmod_list **post);
+				struct kmod_list **pre, struct kmod_list **post);
 int kmod_module_get_filtered_blacklist(const struct kmod_ctx *ctx,
-                    const struct kmod_list *input,
-                    struct kmod_list **output) __attribute__ ((deprecated));
+					const struct kmod_list *input,
+					struct kmod_list **output) __attribute__ ((deprecated));
 int kmod_module_apply_filter(const struct kmod_ctx *ctx,
-                    enum kmod_filter filter_type,
-                    const struct kmod_list *input,
-                    struct kmod_list **output);
+					enum kmod_filter filter_type,
+					const struct kmod_list *input,
+					struct kmod_list **output);
 
 
 
@@ -918,12 +911,12 @@ int kmod_module_apply_filter(const struct kmod_ctx *ctx,
  */
 
 enum kmod_module_initstate {
-    KMOD_MODULE_BUILTIN = 0,
-    KMOD_MODULE_LIVE,
-    KMOD_MODULE_COMING,
-    KMOD_MODULE_GOING,
-    /* Padding to make sure enum is not mapped to char */
-    _KMOD_MODULE_PAD = (1 << 31),
+	KMOD_MODULE_BUILTIN = 0,
+	KMOD_MODULE_LIVE,
+	KMOD_MODULE_COMING,
+	KMOD_MODULE_GOING,
+	/* Padding to make sure enum is not mapped to char */
+	_KMOD_MODULE_PAD = (1 << 31),
 };
 const char *kmod_module_initstate_str(enum kmod_module_initstate state);
 int kmod_module_get_initstate(const struct kmod_module *mod);
@@ -957,11 +950,11 @@ uint64_t kmod_module_symbol_get_crc(const struct kmod_list *entry);
 void kmod_module_symbols_free_list(struct kmod_list *list);
 
 enum kmod_symbol_bind {
-    KMOD_SYMBOL_NONE = '\0',
-    KMOD_SYMBOL_LOCAL = 'L',
-    KMOD_SYMBOL_GLOBAL = 'G',
-    KMOD_SYMBOL_WEAK = 'W',
-    KMOD_SYMBOL_UNDEF = 'U'
+	KMOD_SYMBOL_NONE = '\0',
+	KMOD_SYMBOL_LOCAL = 'L',
+	KMOD_SYMBOL_GLOBAL = 'G',
+	KMOD_SYMBOL_WEAK = 'W',
+	KMOD_SYMBOL_UNDEF = 'U'
 };
 
 int kmod_module_get_dependency_symbols(const struct kmod_module *mod, struct kmod_list **list);
@@ -975,7 +968,7 @@ void kmod_module_dependency_symbols_free_list(struct kmod_list *list);
 #endif
 #endif
 $ 
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 \begin{itemize}
 \item
   头文件是 libkmod
@@ -1009,27 +1002,27 @@ $
 \end{itemize}
 结构体定义
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 /**
  * kmod_ctx:
  *
  * Opaque object representing the library context.
  */
 struct kmod_ctx {
-    int refcount;
-    int log_priority;
-    void (*log_fn)(void *data,
-                    int priority, const char *file, int line,
-                    const char *fn, const char *format, va_list args);
-    void *log_data;
-    const void *userdata;
-    char *dirname;
-    struct kmod_config *config;
-    struct hash *modules_by_name;
-    struct index_mm *indexes[_KMOD_INDEX_MODULES_SIZE];
-    unsigned long long indexes_stamp[_KMOD_INDEX_MODULES_SIZE];
+	int refcount;
+	int log_priority;
+	void (*log_fn)(void *data,
+	                int priority, const char *file, int line,
+	                const char *fn, const char *format, va_list args);
+	void *log_data;
+	const void *userdata;
+	char *dirname;
+	struct kmod_config *config;
+	struct hash *modules_by_name;
+	struct index_mm *indexes[_KMOD_INDEX_MODULES_SIZE];
+	unsigned long long indexes_stamp[_KMOD_INDEX_MODULES_SIZE];
 };
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 \begin{itemize}
 \item
   struct kmod\_list
@@ -1042,16 +1035,16 @@ struct kmod_ctx {
 \end{itemize}
 结构体定义
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 struct list_node {
-    struct list_node *next, *prev;
+	struct list_node *next, *prev;
 };
 
 struct kmod_list {
-    struct list_node node;
-    void *data;
+	struct list_node node;
+	void *data;
 };
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 \begin{itemize}
 \item
   struct kmod\_config\_iter
@@ -1062,17 +1055,17 @@ struct kmod_list {
 \end{itemize}
 结构体定义
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 struct kmod_config_iter {
-    enum config_type type;
-    bool intermediate;
-    const struct kmod_list *list;
-    const struct kmod_list *curr;
-    void *data;
-    const char *(*get_key)(const struct kmod_list *l); 
-    const char *(*get_value)(const struct kmod_list *l); 
+	enum config_type type;
+	bool intermediate;
+	const struct kmod_list *list;
+	const struct kmod_list *curr;
+	void *data;
+	const char *(*get_key)(const struct kmod_list *l); 
+	const char *(*get_value)(const struct kmod_list *l); 
 };
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 \begin{itemize}
 \item
   struct kmod\_module
@@ -1083,7 +1076,7 @@ struct kmod_config_iter {
 \end{itemize}
 结构体定义
 
-{\begin{shaded}\begin{verbatim}
+\begin{verbatim}
 /**
  * SECTION:libkmod-module
  * @short_description: operate on kernel modules
@@ -1095,45 +1088,45 @@ struct kmod_config_iter {
  * Opaque object representing a module.
  */
 struct kmod_module {
-    struct kmod_ctx *ctx;
-    char *hashkey;
-    char *name;
-    char *path;
-    struct kmod_list *dep;
-    char *options;
-    const char *install_commands;   /* owned by kmod_config */
-    const char *remove_commands;    /* owned by kmod_config */
-    char *alias; /* only set if this module was created from an alias */
-    struct kmod_file *file;
-    int n_dep;
-    int refcount;
-    struct {
-        bool dep : 1;
-        bool options : 1;
-        bool install_commands : 1;
-        bool remove_commands : 1;
-    } init;
+	struct kmod_ctx *ctx;
+	char *hashkey;
+	char *name;
+	char *path;
+	struct kmod_list *dep;
+	char *options;
+	const char *install_commands;	/* owned by kmod_config */
+	const char *remove_commands;	/* owned by kmod_config */
+	char *alias; /* only set if this module was created from an alias */
+	struct kmod_file *file;
+	int n_dep;
+	int refcount;
+	struct {
+		bool dep : 1;
+		bool options : 1;
+		bool install_commands : 1;
+		bool remove_commands : 1;
+	} init;
 
-    /*
-     * private field used by kmod_module_get_probe_list() to detect
-     * dependency loops
-     */
-    bool visited : 1;
+	/*
+	 * private field used by kmod_module_get_probe_list() to detect
+	 * dependency loops
+	 */
+	bool visited : 1;
 
-    /*
-     * set by kmod_module_get_probe_list: indicates for probe_insert()
-     * whether the module's command and softdep should be ignored
-     */
-    bool ignorecmd : 1;
+	/*
+	 * set by kmod_module_get_probe_list: indicates for probe_insert()
+	 * whether the module's command and softdep should be ignored
+	 */
+	bool ignorecmd : 1;
 
-    /*
-     * if module was created by searching the modules.builtin file, this
-     * is set. There's nothing much useful one can do with such a
-     * "module", except knowing it's builtin.
-     */
-    bool builtin : 1;
+	/*
+	 * if module was created by searching the modules.builtin file, this
+	 * is set. There's nothing much useful one can do with such a
+	 * "module", except knowing it's builtin.
+	 */
+	bool builtin : 1;
 };
-\end{verbatim}\end{shaded}}
+\end{verbatim}
 \subsubsection{重要接口实现}
 
 \begin{itemize}

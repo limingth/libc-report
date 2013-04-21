@@ -31,12 +31,12 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'<code>'+e+'</code>'+'<\/'+
 <ul>
 <li>首先需要安装如下的软件工具
 <ul>
-<li>GCC compiler</li>
-<li>GNU C library</li>
-<li>autoconf</li>
-<li>shtool</li>
-<li>libtool</li>
-<li>xsltproc</li>
+<li>GCC compiler 编译工具</li>
+<li>GNU C library 标准C库</li>
+<li>autoconf 自动化配置工具，可以生成项目所需的 makefile</li>
+<li>shtool 一个兼容之前类似 mkdir.sh/install.sh 的shell脚本工具</li>
+<li>libtool 制作可生成依赖关系的共享库，生成文件后缀名为 .la, lo</li>
+<li>xsltproc 快速XSLT引擎，可以通过XSL层叠样式表把XML转换为其他格式，例如html/pdf</li>
 </ul></li>
 <li>可选的依赖关系:
 <ul>
@@ -55,27 +55,31 @@ $ autoconf
 $ ./configure CFLAGS=&quot;-g -O2&quot; --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
 $ make &amp;&amp; make install</code></pre>
 <h3 id="错误及解决">错误及解决</h3>
+<p>代码编译过程会出现不少问题，但都可以通过安装和配置逐一解决。现对编译过程中的问题做一总结：</p>
+<p><strong>1）autoconf 缺少环境变量文件</strong></p>
 <pre><code>$ autoconf 
 configure.ac:10: error: possibly undefined macro: AM_INIT_AUTOMAKE
       If this token and others are legitimate, please use m4_pattern_allow.
       See the Autoconf documentation.
 configure.ac:28: error: possibly undefined macro: AM_PROG_CC_C_O
 configure.ac:89: error: possibly undefined macro: AM_CONDITIONAL
-$ aclocal
- (获取当前系统的环境变量，生成一个 aclocal.m4 文件）
-
-$ ./configure CFLAGS=&quot;-g -O2&quot; --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
+$ aclocal</code></pre>
+<p>通过 aclocal 命令生成，获取当前系统的环境变量，生成一个 aclocal.m4 文件。</p>
+<p><strong>2）configure 脚本执行时缺少 libtool 工具</strong></p>
+<pre><code>$ ./configure CFLAGS=&quot;-g -O2&quot; --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
 configure: error: cannot find install-sh, install.sh, or shtool in build-aux &quot;.&quot;/build-aux
 $ autoreconf -f -i -Wall,no-obsolete
 Can&#39;t exec &quot;libtoolize&quot;: No such file or directory at /usr/bin/autoreconf line 196.
 Use of uninitialized value in pattern match (m//) at /usr/bin/autoreconf line 196.
-$ sudo apt-get install libtool
-
-$ ./configure CFLAGS=&quot;-g -O2&quot; --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
+$ sudo apt-get install libtool</code></pre>
+<p>通过 sudo apt-get 安装解决。</p>
+<p><strong>3）configuire 脚本执行缺少 xsltproc 命令</strong></p>
+<pre><code>$ ./configure CFLAGS=&quot;-g -O2&quot; --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib
 configure: error: xsltproc command not found, try ./configure --disable-manpages
-$ sudo apt-get install xsltproc 
-（成功之后，会在当前目录下生成 Makefile 文件）</code></pre>
+$ sudo apt-get install xsltproc </code></pre>
+<p>通过 sudo apt-get 安装解决，成功之后，会在当前目录下生成 Makefile 文件。</p>
 <h3 id="编译过程">编译过程</h3>
+<p>编译过程总体比较顺利，执行 make 和 make install 命令即可完成。</p>
 <pre><code>$ make
 make --no-print-directory all-recursive
 Making all in .
@@ -123,6 +127,7 @@ Making all in man
   GEN    rmmod.8
   GEN    modprobe.8
   GEN    modinfo.8</code></pre>
+<p>由以上编译过程可知，项目主要架构分为2层，上层为 tools 目录下提供的各种工具（兼容之前的命令集，例如 insmod/rmmod），下层为 libkmod 目录下生成的 libkmod.la，为上层工具提供所需要的库函数。</p>
 <h3 id="生成文件">生成文件</h3>
 <pre><code>$ ls tools/ -l | grep x
 lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 depmod -&gt; kmod-nolib
@@ -132,9 +137,9 @@ lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 insmod -&gt; kmod-nolib
 lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 lsmod -&gt; kmod-nolib
 lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 modinfo -&gt; kmod-nolib
 lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 modprobe -&gt; kmod-nolib
-lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 rmmod -&gt; kmod-nolib
-
-$ ls libkmod/ -l | grep lo 
+lrwxrwxrwx 1 akaedu akaedu     10 Apr 17 04:43 rmmod -&gt; kmod-nolib</code></pre>
+<p>可以看出以上所有工具，均是 kmod-nolib 的软链接。实现了一个 kmod-nolib 程序，也就实现了之前的各种工具。 这种实现思路，类似于嵌入式开发中的 busybox 项目，也是实现了一堆工具，但只有一个真正的可执行文件。</p>
+<pre><code>$ ls libkmod/ -l | grep lo 
 -rw-rw-r-- 1 akaedu akaedu   308 Apr 17 04:43 libkmod-array.lo
 -rw-rw-r-- 1 akaedu akaedu   310 Apr 17 04:43 libkmod-config.lo
 -rw-rw-r-- 1 akaedu akaedu   304 Apr 17 04:43 libkmod-elf.lo
@@ -145,16 +150,17 @@ $ ls libkmod/ -l | grep lo
 -rw-rw-r-- 1 akaedu akaedu   296 Apr 17 04:43 libkmod.lo
 -rw-rw-r-- 1 akaedu akaedu   310 Apr 17 04:43 libkmod-module.lo
 -rw-rw-r-- 1 akaedu akaedu   316 Apr 17 04:43 libkmod-signature.lo
--rw-rw-r-- 1 akaedu akaedu   306 Apr 17 04:43 libkmod-util.lo
-
-$ ls libkmod/ -l | grep la
+-rw-rw-r-- 1 akaedu akaedu   306 Apr 17 04:43 libkmod-util.lo</code></pre>
+<p>上面所列的 lo 文件中，libkmod-module.lo 中包含了在整个库中，最靠近上层调用所需要用的接口函数。其他的 lo 文件基本上都是为 libkmod-module.lo 所服务的，比较重要的例如 libkmod-elf, libkmod-file, libkmod-list 等。</p>
+<pre><code>$ ls libkmod/ -l | grep la
 -rw-rw-r-- 1 akaedu akaedu   923 Apr 17 04:43 libkmod.la
 -rw-rw-r-- 1 akaedu akaedu   893 Apr 17 04:43 libkmod-private.la
--rw-rw-r-- 1 akaedu akaedu   884 Apr 17 04:43 libkmod-util.la
-
-$ ls libkmod/ -l | grep pc
+-rw-rw-r-- 1 akaedu akaedu   884 Apr 17 04:43 libkmod-util.la</code></pre>
+<p>最终提供的库文件是以 libkmod.la 的形式存在。</p>
+<pre><code>$ ls libkmod/ -l | grep pc
 -rw-rw-r-- 1 akaedu akaedu   210 Apr 17 04:43 libkmod.pc
 -rw-rw-r-- 1 akaedu akaedu   255 Apr 17 00:53 libkmod.pc.in</code></pre>
+<p>此文件暂时没看出有什么特殊的作用，只包含了一些对当前库的说明信息，是一个纯文本文件。</p>
 <h3 id="安装过程">安装过程</h3>
 <pre><code>$ make &amp;&amp; make install
 make --no-print-directory all-recursive
@@ -170,9 +176,9 @@ libtool: install: /usr/bin/install -c libkmod/.libs/libkmod.so.2.2.3 /usr/lib/li
 /usr/bin/install: cannot create regular file `/usr/lib/libkmod.so.2.2.3&#39;: Permission denied
 make[2]: *** [install-libLTLIBRARIES] Error 1
 make[1]: *** [install-am] Error 2
-make: *** [install-recursive] Error 1
-
-$ sudo make install
+make: *** [install-recursive] Error 1</code></pre>
+<p>编译过程中，因为需要用到对 /usr/bin 目录的读写权限，因此需要用 sudo 来执行。</p>
+<pre><code>$ sudo make install
 Making install in .
 test -z &quot;/usr/lib&quot; || /bin/mkdir -p &quot;/usr/lib&quot;
  /bin/bash ./libtool   --mode=install /usr/bin/install -c   libkmod/libkmod.la &#39;/usr/lib&#39;
@@ -224,23 +230,25 @@ test -z &quot;/usr/share/man/man5&quot; || /bin/mkdir -p &quot;/usr/share/man/ma
 test -z &quot;/usr/share/man/man8&quot; || /bin/mkdir -p &quot;/usr/share/man/man8&quot;
  /usr/bin/install -c -m 644 depmod.8 insmod.8 lsmod.8 rmmod.8 modprobe.8 modinfo.8 &#39;/usr/share/man/man8&#39;
 $ sudo make install</code></pre>
+<p>这个 make 和 make install 的过程，帮助我们理清了哪些文件参与最后的编译生成过程。特别是对于最后 make install 的执行分析，也让我们了解了项目最终要实现的目标和生成的重要文件。以下将对这一过程展开详细分析。</p>
 <h3 id="安装文件">安装文件</h3>
 <pre><code>$ ls /usr/lib/libkmod.so
 libkmod.so        libkmod.so.2      libkmod.so.2.2.3  
 $ ls /usr/lib/libkmod.so* -l
 lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so -&gt; libkmod.so.2.2.3
 lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so.2 -&gt; libkmod.so.2.2.3
--rwxr-xr-x 1 root root 313349 Apr 17 04:55 /usr/lib/libkmod.so.2.2.3
-
-$ ls /usr/lib/libkmod.l* -l
+-rwxr-xr-x 1 root root 313349 Apr 17 04:55 /usr/lib/libkmod.so.2.2.3</code></pre>
+<p>libkmod.so 是一个软链接，安装在系统的 /usr/lib 目录下，链接的时候只需要指定 -lkmod 就可以。</p>
+<pre><code>$ ls /usr/lib/libkmod.l* -l
 -rwxr-xr-x 1 root root 924 Apr 17 04:55 /usr/lib/libkmod.la
+
 $ ls /usr/lib/libkmod.* -l
 -rwxr-xr-x 1 root root    924 Apr 17 04:55 /usr/lib/libkmod.la
 lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so -&gt; libkmod.so.2.2.3
 lrwxrwxrwx 1 root root     16 Apr 17 04:55 /usr/lib/libkmod.so.2 -&gt; libkmod.so.2.2.3
--rwxr-xr-x 1 root root 313349 Apr 17 04:55 /usr/lib/libkmod.so.2.2.3
-
-$ ls /usr/bin/kmod  -l
+-rwxr-xr-x 1 root root 313349 Apr 17 04:55 /usr/lib/libkmod.so.2.2.3</code></pre>
+<p>真正起作用的 so 文件，也就是 libkmod 共享库的 real name 是 libkmod.so.2.2.3。</p>
+<pre><code>$ ls /usr/bin/kmod  -l
 -rwxr-xr-x 1 root root 233584 Apr 17 04:55 /usr/bin/kmod
 $ file /usr/bin/kmod
 /usr/bin/kmod: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.24, BuildID[sha1]=0x9d4131d1eb78b1e1852cc5ad44f06417ae3caa3c, not stripped
@@ -265,14 +273,13 @@ kmod also handles gracefully if called from following symlinks:
   insmod       compat insmod command
   modinfo      compat modinfo command
   modprobe     compat modprobe command
-  depmod       compat depmod command
-
-
-$ ls /usr/include/libkmod.h -l
+  depmod       compat depmod command</code></pre>
+<p>kmod 是一个工具，可以实现内核模块的 list 和 打印输出已经被加载的内核模块的详细信息。</p>
+<pre><code>$ ls /usr/include/libkmod.h -l
 -rw-r--r-- 1 root root 9429 Apr 17 04:55 /usr/include/libkmod.h
-$ 文件内容见下面小节
-
-$ ls /usr/lib/pkgconfig/libkmod.pc -l
+$ 文件内容见下面小节</code></pre>
+<p>头文件是最重要的生成文件，会被之后所有调用 libkmod 库的上层应用所包含。一个文件就包含了所有需要用的函数接口声明，使用起来也非常方便。只不过这个文件中包含了较多的函数，互相之间不是平行的，内部是有上下层次关系的。</p>
+<pre><code>$ ls /usr/lib/pkgconfig/libkmod.pc -l
 -rw-r--r-- 1 root root 210 Apr 17 04:55 /usr/lib/pkgconfig/libkmod.pc
 $ cat /usr/lib/pkgconfig/libkmod.pc 
 prefix=/usr
@@ -286,9 +293,9 @@ Version: 13
 Libs: -L${libdir} -lkmod
 Libs.private:  
 Cflags: -I${includedir}
-$ 
-
-$ ls /usr/share/man/man5/ -l | grep &quot;Apr 17&quot;
+$ </code></pre>
+<p>这个文件只是一个纯文本文件，里面包含了如上所列出的信息。</p>
+<pre><code>$ ls /usr/share/man/man5/ -l | grep &quot;Apr 17&quot;
 -rw-r--r-- 1 root root  3969 Apr 17 04:55 depmod.d.5
 -rw-r--r-- 1 root root  9306 Apr 17  2012 fonts-conf.5.gz
 -rw-r--r-- 1 root root  1599 Apr 17  2012 initramfs.conf.5.gz
@@ -306,8 +313,8 @@ $ ls /usr/share/man/man8/ -l | grep &quot;Apr 17&quot;
 -rw-r--r-- 1 root root  4009 Apr 17 04:55 modinfo.8
 -rw-r--r-- 1 root root 10618 Apr 17 04:55 modprobe.8
 -rw-r--r-- 1 root root  3058 Apr 17 04:55 rmmod.8
--rw-r--r-- 1 root root  1016 Apr 17  2012 update-initramfs.8.gz
-$ </code></pre>
+-rw-r--r-- 1 root root  1016 Apr 17  2012 update-initramfs.8.gz</code></pre>
+<p>以上所有文件，均为 man 手册所准备的，通过 make install 将安装到系统路径 /usr/share/man/man8 下。</p>
 <h3 id="功能简介">功能简介</h3>
 <ul>
 <li>libkmod.so
@@ -697,6 +704,163 @@ void kmod_module_dependency_symbols_free_list(struct kmod_list *list);
 #endif
 #endif
 $ </code></pre>
-<h3 id="接口设计">接口设计</h3>
+<ul>
+<li>头文件是 libkmod 项目所提供的用于包含的函数调用接口，上层编程者一般都需要 include 这个文件。</li>
+<li>以 insmod 命令实现为例，以下函数接口将会用于这个命令实现过程中，典型的调用用法如下：
+<ul>
+<li>kmod_new()</li>
+<li>kmod_module_new_from_path()</li>
+<li>kmod_module_insert_module()</li>
+<li>kmod_module_unref()</li>
+</ul></li>
+</ul>
+<h3 id="数据结构设计">数据结构设计</h3>
+<ul>
+<li>struct kmod_ctx
+<ul>
+<li>该结构体出现在 libkmod/libkmod.c 文件中</li>
+<li>用于读取配置和系统环境参数，用户参数等</li>
+</ul></li>
+</ul>
+<p>结构体定义</p>
+<pre><code>/**
+ * kmod_ctx:
+ *
+ * Opaque object representing the library context.
+ */
+struct kmod_ctx {
+    int refcount;
+    int log_priority;
+    void (*log_fn)(void *data,
+                    int priority, const char *file, int line,
+                    const char *fn, const char *format, va_list args);
+    void *log_data;
+    const void *userdata;
+    char *dirname;
+    struct kmod_config *config;
+    struct hash *modules_by_name;
+    struct index_mm *indexes[_KMOD_INDEX_MODULES_SIZE];
+    unsigned long long indexes_stamp[_KMOD_INDEX_MODULES_SIZE];
+};</code></pre>
+<ul>
+<li>struct kmod_list
+<ul>
+<li>该结构体出现在 libkmod/libkmod-private.h 文件中</li>
+<li>用于访问 kmod 产生的模块节点链表</li>
+</ul></li>
+</ul>
+<p>结构体定义</p>
+<pre><code>struct list_node {
+    struct list_node *next, *prev;
+};
+
+struct kmod_list {
+    struct list_node node;
+    void *data;
+};</code></pre>
+<ul>
+<li>struct kmod_config_iter
+<ul>
+<li>该结构体出现在 libkmod/libkmod-config.c 文件中</li>
+</ul></li>
+</ul>
+<p>结构体定义</p>
+<pre><code>struct kmod_config_iter {
+    enum config_type type;
+    bool intermediate;
+    const struct kmod_list *list;
+    const struct kmod_list *curr;
+    void *data;
+    const char *(*get_key)(const struct kmod_list *l); 
+    const char *(*get_value)(const struct kmod_list *l); 
+};</code></pre>
+<ul>
+<li>struct kmod_module
+<ul>
+<li>该结构体出现在 libkmod/libkmod-module.c 文件中</li>
+</ul></li>
+</ul>
+<p>结构体定义</p>
+<pre><code>/**
+ * SECTION:libkmod-module
+ * @short_description: operate on kernel modules
+ */
+
+/**
+ * kmod_module:
+ *
+ * Opaque object representing a module.
+ */
+struct kmod_module {
+    struct kmod_ctx *ctx;
+    char *hashkey;
+    char *name;
+    char *path;
+    struct kmod_list *dep;
+    char *options;
+    const char *install_commands;   /* owned by kmod_config */
+    const char *remove_commands;    /* owned by kmod_config */
+    char *alias; /* only set if this module was created from an alias */
+    struct kmod_file *file;
+    int n_dep;
+    int refcount;
+    struct {
+        bool dep : 1;
+        bool options : 1;
+        bool install_commands : 1;
+        bool remove_commands : 1;
+    } init;
+
+    /*
+     * private field used by kmod_module_get_probe_list() to detect
+     * dependency loops
+     */
+    bool visited : 1;
+
+    /*
+     * set by kmod_module_get_probe_list: indicates for probe_insert()
+     * whether the module&#39;s command and softdep should be ignored
+     */
+    bool ignorecmd : 1;
+
+    /*
+     * if module was created by searching the modules.builtin file, this
+     * is set. There&#39;s nothing much useful one can do with such a
+     * &quot;module&quot;, except knowing it&#39;s builtin.
+     */
+    bool builtin : 1;
+};</code></pre>
 <h3 id="重要接口实现">重要接口实现</h3>
-<h3 id="调用流程图">调用流程图</h3>
+<ul>
+<li>kmod_module_insert_module() in libkmod/libkmod-module.c
+<ul>
+<li>kmod_module_get_path()</li>
+<li>file = kmod_file_open()</li>
+<li>kmod_file_get_direct()</li>
+<li>size = kmod_file_get_size(file)</li>
+<li>mem = kmod_file_get_contents(file)</li>
+<li>kmod_elf_new()</li>
+<li>kmod_elf_strip_section()</li>
+<li>kmod_elf_get_memory()</li>
+<li>init_module(mem, size, args)</li>
+<li>kmod_elf_unref()</li>
+<li>kmod_file_unref()</li>
+</ul></li>
+<li>对比 module-init-tools 的实现，可以发现代码的层次逻辑复杂不少
+<ul>
+<li>realloc()</li>
+<li>grab_file()
+<ul>
+<li>open()</li>
+<li>malloc()</li>
+<li>read()</li>
+<li>close()</li>
+</ul></li>
+<li>init_module(file, len, options)</li>
+<li>free()</li>
+</ul></li>
+<li>kmod_module_remove_module in libkmod/libkmod-module.c
+<ul>
+<li>delete_module()</li>
+</ul></li>
+</ul>
