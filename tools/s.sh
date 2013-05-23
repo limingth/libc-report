@@ -14,13 +14,13 @@ function subs_file()
 		cat $ROOT/$PUBCMT $ROOT/$cmt_file > $ROOT/$cmt_file.tmp
 		sed '/'$cmt_file'/r '$ROOT\/$cmt_file.tmp $FILE.tmp > $FILE.tmp2
 		sed '/'$cmt_file'/d' $FILE.tmp2 > $FILE.tmp 
+		rm $ROOT/$cmt_file.tmp
 	done
 
 	# cat $FILE.tmp
 	cp $FILE.tmp $FILE
 	rm $FILE.tmp
 	rm $FILE.tmp2
-	rm $ROOT/$cmt_file.tmp
 }
 
 function subs_dir()
