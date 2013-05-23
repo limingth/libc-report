@@ -11,7 +11,8 @@ function subs_file()
 	for cmt_file in $cmt_files
 	do
 		# echo substitute $cmt_file
-		sed '/'$cmt_file'/r '$ROOT\/$cmt_file $FILE.tmp > $FILE.tmp2
+		cat $ROOT/$PUBCMT $ROOT/$cmt_file > $ROOT/$cmt_file.tmp
+		sed '/'$cmt_file'/r '$ROOT\/$cmt_file.tmp $FILE.tmp > $FILE.tmp2
 		sed '/'$cmt_file'/d' $FILE.tmp2 > $FILE.tmp 
 	done
 
@@ -19,6 +20,7 @@ function subs_file()
 	cp $FILE.tmp $FILE
 	rm $FILE.tmp
 	rm $FILE.tmp2
+	rm $ROOT/$cmt_file.tmp
 }
 
 function subs_dir()
@@ -49,6 +51,7 @@ function subs_dir()
 }
 
 ROOT=$PWD
+PUBCMT=pub.cmt
 
 echo Total \*.c files
 find $1 -name "*.c" | wc -l
@@ -59,6 +62,13 @@ echo $cmt_files
 SRC=$1
 DST=$1_subs
 # echo $DST
+
+if [ "$1" == "" ]
+then
+	echo Your must enter the dir name 
+	echo For example: ./s.sh testdir
+	exit
+fi
 
 rm -rf $DST
 mkdir $DST
